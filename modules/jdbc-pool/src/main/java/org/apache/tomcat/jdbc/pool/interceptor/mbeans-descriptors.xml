@@ -21,7 +21,7 @@
 <mbeans-descriptors>
 
   <mbean description="Reports slow and failed queries through JMX and publishes the statistics of the pool that registered it" domain="tomcat.jdbc" group="jdbc-pool" name="SlowQueryReportJmx"
-         type="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx">
+         type="org.apache.tomcat.jdbc.pool.interceptor.SlowQueryReportJmx$Registration">
 
     <attribute description="The name of the connection pool this Jmx bean is representing" name="PoolName" type="java.lang.String" writeable="false"/>
     <attribute description="Names of the pools that currently publish recorded statistics in this JVM" name="PoolNames" type="[Ljava.lang.String;" writeable="false"/>

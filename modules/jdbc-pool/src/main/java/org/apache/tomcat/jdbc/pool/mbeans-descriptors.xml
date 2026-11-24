@@ -22,14 +22,9 @@
 
     <mbean        name="TomcatJDBCPool"
            description="Provides per diagnostic metrics and notifications for JDBC operations"
-                domain="tomcat"
+                domain="tomcat.jdbc"
                  group="jdbc"
-                  type="org.apache.tomcat.jdbc.pool.DataSource">
-
-    <attribute    name="className"
-           description="Fully qualified class name of the managed object"
-                  type="java.lang.String"
-             writeable="false"/>
+                  type="org.apache.tomcat.jdbc.pool.jmx.ConnectionPool">
 
     <attribute    name="size"
            description="The current pool size: idle and in-use connection slots, including wake-up placeholders for waiting borrowers"
@@ -168,7 +163,7 @@
              writeable="false"/>
 
     <attribute    name="accessToUnderlyingConnectionAllowed"
-           description="Returns true if one can retrieve the actual JDBC connection"
+           description="Always true: access to the underlying JDBC connection is always allowed through unwrap(), and the matching setter is a no-op"
                   type="java.lang.Boolean"
                     is="true"
              writeable="false"/>
@@ -290,8 +285,8 @@
              writeable="false"/>
 
     <attribute    name="dataSource"
-           description="Data source that is injected into the pool"
-                  type="javax.sql.DataSource"
+           description="Data source that is injected into the pool; may be a javax.sql.DataSource, XADataSource or ConnectionPoolDataSource"
+                  type="java.lang.Object"
              writeable="false"/>
 
     <attribute    name="dataSourceJNDI"

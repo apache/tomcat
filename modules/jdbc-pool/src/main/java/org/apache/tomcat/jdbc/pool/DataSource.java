@@ -36,6 +36,13 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * is used as a generic proxy. The DataSource simply wraps a {@link ConnectionPool} in order to provide a standard
  * interface to the user.
  * <p>
+ * This class is not a JMX-compliant Standard MBean: it implements {@link MBeanRegistration} and
+ * {@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPoolMBean}, but it has no {@code DataSourceMBean} interface, so a
+ * direct {@link MBeanServer#registerMBean(Object, ObjectName)} call fails with
+ * {@link javax.management.NotCompliantMBeanException}. It is registered through the container's modeler-style wrapper,
+ * which supplies the management interface; that registration is what publishes the pool MBean and the connection and
+ * interceptor MBeans below it.
+ * <p>
  * A JMX registration made before the pool exists publishes nothing, because there is no pool MBean to publish. Create
  * the pool before registering the data source, or register it again after the pool has been created, to have the pool
  * monitored.
@@ -230,9 +237,11 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
     }
 
     /**
-     * Registers the ConnectionPoolMBean under a unique name derived from the DataSource's ObjectName. A pool that has
-     * not been created, or a publish the server refused, is skipped without disturbing a handle this data source
-     * already holds.
+     * Registers the ConnectionPoolMBean under a unique name derived from the DataSource's ObjectName. This method is
+     * the publication step of the data source's own {@link MBeanRegistration} lifecycle: the name it publishes is the
+     * pending name {@link #preRegister(MBeanServer, ObjectName)} recorded, so a direct call outside that lifecycle has
+     * no name to derive a pool name from and publishes nothing (with a warning). When the pool MBean is already
+     * published, the call leaves that publication in place and sweeps the connection MBeans below it.
      */
     protected void registerJmx() {
         final ConnectionPool p;
@@ -263,6 +272,18 @@ public class DataSource extends DataSourceProxy implements javax.sql.DataSource,
         final ObjectName name = pendingName == null ? oname : pendingName;
         if (jmx == null) {
             log.warn(MessageFactory.get("dataSource.mbeanNotRegistered", name));
+            return null;
+        }
+        if (pendingName == null && oname != null) {
+            // A direct call while the pool MBean is already published must not
+            // try to register the same name again; leave the publication in
+            // place and let the caller sweep the connection MBeans below it.
+            return p;
+        }
+        if (name == null) {
+            // Outside the registration lifecycle there is no data source
+            // ObjectName to derive a unique pool name from.
+            log.warn(MessageFactory.get("dataSource.mbeanNameUnavailable"));
             return null;
         }
         final ObjectName published = JmxUtil.registerJmx(name, null, jmx);
