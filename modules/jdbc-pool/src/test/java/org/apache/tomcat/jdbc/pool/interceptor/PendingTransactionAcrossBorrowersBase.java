@@ -36,10 +36,10 @@ import org.apache.tomcat.jdbc.pool.ProxyConnection;
  * read-only restores are deferred until the next transaction (or refused),
  * and restoring auto-commit to true commits whatever the previous borrower
  * left pending. The {@link ConnectionState} interceptor must therefore
- * terminate the pending transaction before restoring the configured
- * defaults - but only when there are defaults to restore, since a pool that
- * uses the interceptor purely to cache the state must leave the pool's own
- * documented transaction handling untouched.
+ * terminate the pending transaction before restoring the state - whether
+ * that state is a configured default or the session's own initial value,
+ * which a caching-only configuration restores. Restoring auto-commit to true
+ * over an open transaction would commit the previous borrower's work.
  * Validation of the connection (testOnBorrow, testOnReturn, testWhileIdle)
  * runs before any of this and is part of that handling: a validation that
  * actually reaches the database must terminate a pending transaction the
@@ -121,12 +121,13 @@ abstract class PendingTransactionAcrossBorrowersBase extends JdbcPoolBaseTest {
     }
 
     @Test
-    void withoutConfiguredDefaultsTheInterceptorLeavesTheTransactionAlone()
+    void withoutConfiguredDefaultsTheRestoredInitialAutoCommitIsNotCommitted()
             throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(ConnectionState.class.getSimpleName());
-        // no default auto-commit/isolation/read-only/catalog: the
-        // interceptor only caches the state, nothing is restored on borrow
+        // no default auto-commit/isolation/read-only/catalog: the interceptor
+        // restores the session's own initial state, and restoring
+        // auto-commit to true must not commit the pending work
         String t = createTable(ds);
 
         Connection first = ds.getConnection();
@@ -137,10 +138,13 @@ abstract class PendingTransactionAcrossBorrowersBase extends JdbcPoolBaseTest {
         try (Connection second = ds.getConnection()) {
             Assertions.assertEquals(Integer.valueOf(32), sessionMarker(second),
                     "the same physical session must have been reused");
-            Assertions.assertEquals(1, rowCount(second, t),
-                    "a caching-only configuration must keep the pool's "
-                            + "documented transaction handling untouched");
+            Assertions.assertEquals(0, rowCount(second, t),
+                    "a caching-only configuration must not hand the previous "
+                            + "borrower's transaction to the next borrower");
         }
+        Assertions.assertEquals(0, adminRowCount(t),
+                "restoring the session's initial auto-commit must not commit "
+                        + "the work the previous borrower abandoned");
     }
 
     @Test
@@ -278,12 +282,10 @@ abstract class PendingTransactionAcrossBorrowersBase extends JdbcPoolBaseTest {
     @Test
     void withoutConfiguredDefaultsValidationStillTerminatesTheTransaction()
             throws Exception {
-        // Caching-only configuration: reset() leaves a pending transaction
-        // alone (pinned above), but a validation that actually reaches the
-        // database still ends it - by rollback. So with validation enabled
-        // the abandoned work does not survive to the next borrower either;
-        // the "transaction untouched" behavior only holds for pools whose
-        // validations do not run.
+        // Caching-only configuration: reset() restores the session's initial
+        // state, and a validation that actually reaches the database ends a
+        // pending transaction too - both by rollback. The abandoned work does
+        // not survive to the next borrower either way.
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(ConnectionState.class.getSimpleName());
         ds.getPoolProperties().setValidationQuery("SELECT 1");

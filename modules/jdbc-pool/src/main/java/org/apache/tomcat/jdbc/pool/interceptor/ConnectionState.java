@@ -44,7 +44,9 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * configured defaults - {@code defaultAutoCommit}, {@code defaultReadOnly}, {@code defaultTransactionIsolation} and
  * {@code defaultCatalog}: {@link org.apache.tomcat.jdbc.pool.PooledConnection#connect()} no longer applies them at
  * connection creation, and {@link #reset(ConnectionPool, PooledConnection)} applies them to every borrow and re-applies
- * whatever a previous borrower changed, on the terms that method states.
+ * whatever a previous borrower changed, on the terms that method states. A state the pool does not configure is
+ * restored to the value the physical session was established with, captured when the session is first seen, so a
+ * caching-only configuration does not carry one borrower's setting into the next borrow either.
  * <p>
  * A subclass that overrides {@link #reset(ConnectionPool, PooledConnection)} must call the superclass, or apply those
  * defaults itself. The pool recognises this class by type and, having found it, leaves the defaults to the interceptor
@@ -130,57 +132,145 @@ public class ConnectionState extends JdbcInterceptor {
      */
     private ProxyConnection chainFence = null;
 
+    /**
+     * The auto-commit state the physical session was established with. It is the state a borrower must find when
+     * the pool configures no {@code defaultAutoCommit}, so that one borrower's change does not outlive its borrow.
+     * {@code null} when the driver could not answer or when no session has been captured: nothing is restored then,
+     * and the cached read falls through instead of serving a stale value.
+     */
+    private Boolean initialAutoCommit = null;
+
+    /**
+     * The transaction isolation level the physical session was established with, or {@code null} when it could not
+     * be read. Used the same way as {@link #initialAutoCommit}.
+     */
+    private Integer initialTransactionIsolation = null;
+
+    /**
+     * The read-only state the physical session was established with, or {@code null} when it could not be read.
+     * Used the same way as {@link #initialAutoCommit}.
+     */
+    private Boolean initialReadOnly = null;
+
+    /**
+     * The catalog the physical session was established with. A {@code null} value is ambiguous - the driver may
+     * have no catalog or may have failed to answer it - so it is only recorded when read successfully; see
+     * {@link #initialCatalogKnown}.
+     */
+    private String initialCatalog = null;
+
+    /**
+     * Whether {@link #initialCatalog} holds the physical session's initial catalog. Kept apart from the value
+     * because a driver may legitimately establish a session with no catalog.
+     */
+    private boolean initialCatalogKnown = false;
+
 
     /**
      * Restores the connection state the pool was configured to enforce. The pool invokes this on every borrow, before
      * the connection is handed to its next borrower.
      * <p>
+     * Each of the four states is restored to the configured default when one is configured. A state the pool does not
+     * configure is restored to the state the physical session was established with, captured once when the session is
+     * first seen: keeping one borrower's auto-commit, isolation, read-only or catalog setting across a return would
+     * hand that state to a borrower that never asked for it. A state whose initial value the driver would not report
+     * cannot be restored; its cached value is dropped on every borrow instead, so a read reaches the driver and
+     * reflects the session rather than answering from one borrower's cache.
+     * <p>
      * When any restore is pending, a transaction the previous borrower left open is terminated first: isolation and
      * read only are transaction scoped on many drivers, an open transaction would absorb the restores, and restoring
      * auto-commit would silently commit the previous borrower's work. Failing to terminate that transaction, and a
      * confirmed refusal to restore the read-only, auto-commit or catalog state, fail the borrow and retire the
-     * session - a connection known to sit in a state other than the configured one must not reach a borrower. A
-     * refusal the driver blames on the session's transaction state is confirmed first, against a session freed of it
+     * session - a connection known to sit in a state other than the one the pool hands out must not reach a borrower.
+     * A refusal the driver blames on the session's transaction state is confirmed first, against a session freed of it
      * ({@link #confirmAgainstFreedSession}).
      * <p>
      * A transaction isolation level the driver refuses on a freed session is the one confirmed failure that does not
      * retire the connection: the level is recorded ({@link #refusedIsolationLevel}) and stops counting as a pending
      * restore, so later borrows neither retry it nor pay a transaction termination on its behalf. When nothing needs
-     * restoring, nothing is terminated - a pool that uses this interceptor only to cache the state pays nothing.
+     * restoring, nothing is terminated.
      *
      * @param parent the pool the connection belongs to, or {@code null} when the interceptor chain is being torn down
      * @param con    the pooled connection being set up for its next borrower
      */
-    @SuppressWarnings("null") // The resetX booleans guard each defaultX for null, but do not read to ECJ as doing so
+    @SuppressWarnings("null") // The resetX booleans guard each target for null, but do not read to ECJ as doing so
     @Override
     public void reset(ConnectionPool parent, PooledConnection con) {
         if (parent == null || con == null) {
             // Teardown walk: the chain is being taken out of service, and
             // nothing may be remembered about a session that is gone.
-            autoCommit = null;
-            transactionIsolation = null;
-            readOnly = null;
-            catalog = null;
+            clearState();
             refusedIsolationLevel = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
             served = null;
             return;
         }
         // The record of the served connection travels with the arming of
-        // the chain and the caches, as served's javadoc states.
+        // the chain and the caches, as served's javadoc states. A null
+        // record means no session has served a borrow yet on this chain: the
+        // connection was just established, or a reconnect has replaced the
+        // session and the disconnect walked the chain first, so the state
+        // read below is still the one the driver set up.
+        final boolean newSession = served == null;
         served = con;
         PoolConfiguration poolProperties = parent.getPoolProperties();
         final int defaultTransactionIsolation = poolProperties.getDefaultTransactionIsolation();
         final Boolean defaultReadOnly = poolProperties.getDefaultReadOnly();
         final Boolean defaultAutoCommit = poolProperties.getDefaultAutoCommit();
         final String defaultCatalog = poolProperties.getDefaultCatalog();
-        boolean resetTransactionIsolation = defaultTransactionIsolation != DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION &&
-                refusedIsolationLevel != defaultTransactionIsolation &&
-                (transactionIsolation == null || transactionIsolation.intValue() != defaultTransactionIsolation);
-        boolean resetReadOnly = defaultReadOnly != null &&
-                (readOnly == null || readOnly.booleanValue() != defaultReadOnly.booleanValue());
-        boolean resetAutoCommit = defaultAutoCommit != null &&
-                (autoCommit == null || autoCommit.booleanValue() != defaultAutoCommit.booleanValue());
-        boolean resetCatalog = defaultCatalog != null && (catalog == null || !catalog.equals(defaultCatalog));
+        Connection raw = con.getConnection();
+        if (raw != null && newSession) {
+            // Capture the session's initial state once, for the fields the
+            // pool does not configure, before a borrower can change it.
+            initialAutoCommit = defaultAutoCommit == null ? readAutoCommit(raw) : null;
+            initialTransactionIsolation = defaultTransactionIsolation == DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION
+                    ? readTransactionIsolation(raw) : null;
+            initialReadOnly = defaultReadOnly == null ? readReadOnly(raw) : null;
+            if (defaultCatalog == null) {
+                initialCatalogKnown = captureCatalog(raw);
+            } else {
+                initialCatalog = null;
+                initialCatalogKnown = false;
+            }
+            // The captured values are also the session's current state, so
+            // seed the cache with them: a borrower that makes no change has
+            // nothing to restore, and a cached read answers correctly until
+            // a restore replaces the value.
+            autoCommit = initialAutoCommit;
+            transactionIsolation = initialTransactionIsolation;
+            readOnly = initialReadOnly;
+            catalog = initialCatalogKnown ? initialCatalog : null;
+        }
+        final Integer targetTransactionIsolation = defaultTransactionIsolation !=
+                DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION
+                        ? Integer.valueOf(defaultTransactionIsolation) : initialTransactionIsolation;
+        final Boolean targetReadOnly = defaultReadOnly != null ? defaultReadOnly : initialReadOnly;
+        final Boolean targetAutoCommit = defaultAutoCommit != null ? defaultAutoCommit : initialAutoCommit;
+        final String targetCatalog = defaultCatalog != null ? defaultCatalog : initialCatalog;
+        final boolean targetCatalogKnown = defaultCatalog != null || initialCatalogKnown;
+        if (targetAutoCommit == null) {
+            // No configured value and no captured initial value (the driver
+            // would not report one): a cached read must not answer from the
+            // previous borrower's setting.
+            autoCommit = null;
+        }
+        if (targetTransactionIsolation == null) {
+            transactionIsolation = null;
+        }
+        if (targetReadOnly == null) {
+            readOnly = null;
+        }
+        if (!targetCatalogKnown) {
+            catalog = null;
+        }
+        boolean resetTransactionIsolation = targetTransactionIsolation != null &&
+                refusedIsolationLevel != targetTransactionIsolation.intValue() &&
+                (transactionIsolation == null ||
+                        transactionIsolation.intValue() != targetTransactionIsolation.intValue());
+        boolean resetReadOnly = targetReadOnly != null &&
+                (readOnly == null || readOnly.booleanValue() != targetReadOnly.booleanValue());
+        boolean resetAutoCommit = targetAutoCommit != null &&
+                (autoCommit == null || autoCommit.booleanValue() != targetAutoCommit.booleanValue());
+        boolean resetCatalog = targetCatalogKnown && (catalog == null || !catalog.equals(targetCatalog));
         if (resetTransactionIsolation || resetReadOnly || resetAutoCommit || resetCatalog) {
             // The javadoc's terminate-first step. The transaction may have
             // survived the return, unless the pool was configured to
@@ -188,8 +278,7 @@ public class ConnectionState extends JdbcInterceptor {
             // pool's own termination paths use - auto-commit off means a
             // transaction is open.
             try {
-                Connection raw = con.getConnection();
-                if (!raw.getAutoCommit()) {
+                if (raw != null && !raw.getAutoCommit()) {
                     raw.rollback();
                 }
             } catch (SQLException x) {
@@ -203,37 +292,38 @@ public class ConnectionState extends JdbcInterceptor {
         }
         if (resetTransactionIsolation) {
             try {
-                if (transactionIsolation == null || transactionIsolation.intValue() != defaultTransactionIsolation) {
-                    con.getConnection().setTransactionIsolation(defaultTransactionIsolation);
-                    transactionIsolation = Integer.valueOf(defaultTransactionIsolation);
+                if (transactionIsolation == null ||
+                        transactionIsolation.intValue() != targetTransactionIsolation.intValue()) {
+                    con.getConnection().setTransactionIsolation(targetTransactionIsolation.intValue());
+                    transactionIsolation = targetTransactionIsolation;
                 }
             } catch (SQLException x) {
                 transactionIsolation = null;
                 // A driver that refuses a level refuses it for this session,
-                // and the configured level changes rarely, so retrying per
-                // borrow would keep the pool paying a doomed round trip and
-                // its error log forever - the refusal is recorded
-                // (refusedIsolationLevel) and reported here, at refusal
-                // time. A refusal reported as a transaction-state error may
-                // instead blame state the auto-commit probe above never saw,
-                // so it first gets its confirmation against a freed session.
+                // and the level changes rarely, so retrying per borrow would
+                // keep the pool paying a doomed round trip and its error log
+                // forever - the refusal is recorded (refusedIsolationLevel)
+                // and reported here, at refusal time. A refusal reported as a
+                // transaction-state error may instead blame state the
+                // auto-commit probe above never saw, so it first gets its
+                // confirmation against a freed session.
                 SQLException confirmed = confirmAgainstFreedSession(con, x,
-                        raw -> raw.setTransactionIsolation(defaultTransactionIsolation));
+                        session -> session.setTransactionIsolation(targetTransactionIsolation.intValue()));
                 if (confirmed == null) {
-                    transactionIsolation = Integer.valueOf(defaultTransactionIsolation);
+                    transactionIsolation = targetTransactionIsolation;
                 } else {
-                    refusedIsolationLevel = defaultTransactionIsolation;
+                    refusedIsolationLevel = targetTransactionIsolation.intValue();
                     log.error(MessageFactory.get("connectionState.unableToResetTransactionIsolation",
-                            Integer.valueOf(defaultTransactionIsolation)),
+                            targetTransactionIsolation),
                             PoolUtilities.maskCredentials(confirmed));
                 }
             }
         }
         if (resetReadOnly) {
             try {
-                if (readOnly == null || readOnly.booleanValue() != defaultReadOnly.booleanValue()) {
-                    con.getConnection().setReadOnly(defaultReadOnly.booleanValue());
-                    readOnly = defaultReadOnly;
+                if (readOnly == null || readOnly.booleanValue() != targetReadOnly.booleanValue()) {
+                    con.getConnection().setReadOnly(targetReadOnly.booleanValue());
+                    readOnly = targetReadOnly;
                 }
             } catch (SQLException x) {
                 readOnly = null;
@@ -243,70 +333,163 @@ public class ConnectionState extends JdbcInterceptor {
                 // and a driver that accepts the restore there was never
                 // unable to apply it.
                 SQLException confirmed = confirmAgainstFreedSession(con, x,
-                        raw -> raw.setReadOnly(defaultReadOnly.booleanValue()));
+                        session -> session.setReadOnly(targetReadOnly.booleanValue()));
                 if (confirmed == null) {
-                    readOnly = defaultReadOnly;
+                    readOnly = targetReadOnly;
                 } else {
-                    // The connection is known to sit in a state the pool was
-                    // configured not to hand out, and the restore that would
-                    // fix that failed even on a session freed of its
-                    // transaction, so it must not go to the next borrower.
+                    // The connection is known to sit in a state the pool must
+                    // not hand out, and the restore that would fix that failed
+                    // even on a session freed of its transaction, so it must
+                    // not go to the next borrower.
                     // ConnectionPool.setupConnection() catches this, discards
                     // the connection and fails the borrow.
                     throw new IllegalStateException(
-                            MessageFactory.get("connectionState.unableToRestoreReadOnly", defaultReadOnly),
+                            MessageFactory.get("connectionState.unableToRestoreReadOnly", targetReadOnly),
                             confirmed);
                 }
             }
         }
         if (resetAutoCommit) {
             try {
-                if (autoCommit == null || autoCommit.booleanValue() != defaultAutoCommit.booleanValue()) {
-                    con.getConnection().setAutoCommit(defaultAutoCommit.booleanValue());
-                    autoCommit = defaultAutoCommit;
+                if (autoCommit == null || autoCommit.booleanValue() != targetAutoCommit.booleanValue()) {
+                    con.getConnection().setAutoCommit(targetAutoCommit.booleanValue());
+                    autoCommit = targetAutoCommit;
                 }
             } catch (SQLException x) {
                 autoCommit = null;
                 // As for the read-only state above: the driver refused the
-                // configured auto-commit state even on a session freed of its
+                // target auto-commit state even on a session freed of its
                 // transaction, so the borrow fails and the connection is
                 // discarded.
                 SQLException confirmed = confirmAgainstFreedSession(con, x,
-                        raw -> raw.setAutoCommit(defaultAutoCommit.booleanValue()));
+                        session -> session.setAutoCommit(targetAutoCommit.booleanValue()));
                 if (confirmed == null) {
-                    autoCommit = defaultAutoCommit;
+                    autoCommit = targetAutoCommit;
                 } else {
                     throw new IllegalStateException(
-                            MessageFactory.get("connectionState.unableToRestoreAutoCommit", defaultAutoCommit),
+                            MessageFactory.get("connectionState.unableToRestoreAutoCommit", targetAutoCommit),
                             confirmed);
                 }
             }
         }
         if (resetCatalog) {
             try {
-                if (catalog == null || (!catalog.equals(defaultCatalog))) {
-                    con.getConnection().setCatalog(defaultCatalog);
-                    catalog = defaultCatalog;
+                if (catalog == null || (!catalog.equals(targetCatalog))) {
+                    con.getConnection().setCatalog(targetCatalog);
+                    catalog = targetCatalog;
                 }
             } catch (SQLException x) {
                 catalog = null;
                 // As for the read-only state above: the driver refused the
-                // configured catalog even on a session freed of its
-                // transaction, so the borrower learns of the misconfiguration
-                // instead of getting a connection that was never pointed at
-                // the database the pool asks it to work in.
+                // target catalog even on a session freed of its transaction,
+                // so the borrower learns of the failure instead of getting a
+                // connection that was never pointed at the right database.
                 SQLException confirmed = confirmAgainstFreedSession(con, x,
-                        raw -> raw.setCatalog(defaultCatalog));
+                        session -> session.setCatalog(targetCatalog));
                 if (confirmed == null) {
-                    catalog = defaultCatalog;
+                    catalog = targetCatalog;
                 } else {
                     throw new IllegalStateException(
-                            MessageFactory.get("connectionState.unableToRestoreCatalog", defaultCatalog),
+                            MessageFactory.get("connectionState.unableToRestoreCatalog", targetCatalog),
                             confirmed);
                 }
             }
         }
 
+    }
+
+
+    /**
+     * Clears every cached and captured state value. Called when the session
+     * goes out of service.
+     */
+    private void clearState() {
+        autoCommit = null;
+        transactionIsolation = null;
+        readOnly = null;
+        catalog = null;
+        initialAutoCommit = null;
+        initialTransactionIsolation = null;
+        initialReadOnly = null;
+        initialCatalog = null;
+        initialCatalogKnown = false;
+    }
+
+
+    /**
+     * Reads the auto-commit state a physical session was established with.
+     *
+     * @param raw the physical session
+     * @return its auto-commit state, or {@code null} if the driver would not
+     *         report it
+     */
+    private Boolean readAutoCommit(Connection raw) {
+        try {
+            return Boolean.valueOf(raw.getAutoCommit());
+        } catch (SQLException x) {
+            log.debug(MessageFactory.get("connectionState.unableToReadInitialState", "auto-commit"),
+                    PoolUtilities.maskCredentials(x));
+            return null;
+        }
+    }
+
+
+    /**
+     * Reads the transaction isolation level a physical session was established
+     * with.
+     *
+     * @param raw the physical session
+     * @return its isolation level, or {@code null} if the driver would not
+     *         report it
+     */
+    private Integer readTransactionIsolation(Connection raw) {
+        try {
+            return Integer.valueOf(raw.getTransactionIsolation());
+        } catch (SQLException x) {
+            log.debug(MessageFactory.get("connectionState.unableToReadInitialState", "transaction isolation"),
+                    PoolUtilities.maskCredentials(x));
+            return null;
+        }
+    }
+
+
+    /**
+     * Reads the read-only state a physical session was established with.
+     *
+     * @param raw the physical session
+     * @return its read-only state, or {@code null} if the driver would not
+     *         report it
+     */
+    private Boolean readReadOnly(Connection raw) {
+        try {
+            return Boolean.valueOf(raw.isReadOnly());
+        } catch (SQLException x) {
+            log.debug(MessageFactory.get("connectionState.unableToReadInitialState", "read-only"),
+                    PoolUtilities.maskCredentials(x));
+            return null;
+        }
+    }
+
+
+    /**
+     * Reads the catalog a physical session was established with. The answer is
+     * recorded in {@link #initialCatalog} together with
+     * {@link #initialCatalogKnown}, so a driver's null catalog is distinguished
+     * from a driver that would not report one.
+     *
+     * @param raw the physical session
+     * @return {@code true} if the driver reported its catalog
+     */
+    private boolean captureCatalog(Connection raw) {
+        try {
+            initialCatalog = raw.getCatalog();
+            return true;
+        } catch (SQLException x) {
+            log.debug(MessageFactory.get("connectionState.unableToReadInitialState", "catalog"),
+                    PoolUtilities.maskCredentials(x));
+            initialCatalog = null;
+            return false;
+        }
     }
 
 
@@ -397,10 +580,7 @@ public class ConnectionState extends JdbcInterceptor {
     public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
         // The session goes out of service: everything the caches describe
         // is about to stop existing.
-        autoCommit = null;
-        transactionIsolation = null;
-        readOnly = null;
-        catalog = null;
+        clearState();
         refusedIsolationLevel = DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION;
         served = null;
         super.disconnected(parent, con, finalizing);

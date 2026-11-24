@@ -107,6 +107,66 @@ abstract class SessionStateBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void withoutConfiguredDefaultsTheStateDoesNotLeakToTheNextBorrower() throws Exception {
+        // Caching-only configuration: no default is configured, so the
+        // interceptor has nothing of the pool's own to restore - but it must
+        // still not hand one borrower's session state to the next through its
+        // cache, nor leave the physical session in the previous borrower's
+        // state. Each state the pool did not configure is restored to the
+        // state the physical session was established with.
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setJdbcInterceptors(ConnectionState.class.getSimpleName());
+        ds.createPool();
+
+        int initialIsolation;
+        String initialCatalog;
+        try (Connection first = ds.getConnection()) {
+            initialIsolation = first.getTransactionIsolation();
+            initialCatalog = first.getCatalog();
+            setSessionMarker(first, 22);
+            first.setAutoCommit(false);
+            first.setReadOnly(true);
+            first.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            Assertions.assertFalse(first.getAutoCommit(),
+                    "the borrower's own change must be visible to it");
+            Assertions.assertTrue(first.isReadOnly(),
+                    "the borrower's own change must be visible to it");
+            Assertions.assertEquals(Connection.TRANSACTION_SERIALIZABLE,
+                    first.getTransactionIsolation(),
+                    "the borrower's own change must be visible to it");
+        }
+
+        try (Connection second = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(22), sessionMarker(second),
+                    "the same physical session must have been reused");
+            Assertions.assertTrue(second.getAutoCommit(),
+                    "a caching-only pool must not hand the previous borrower's auto-commit state "
+                            + "to the next borrower");
+            Assertions.assertFalse(second.isReadOnly(),
+                    "a caching-only pool must not hand the previous borrower's read-only state "
+                            + "to the next borrower");
+            Assertions.assertEquals(initialIsolation, second.getTransactionIsolation(),
+                    "a caching-only pool must restore the session's initial isolation level "
+                            + "for the next borrower");
+            Assertions.assertEquals(initialCatalog, second.getCatalog(),
+                    "a caching-only pool must restore the session's initial catalog "
+                            + "for the next borrower");
+
+            // The same answers straight from the driver's session: the cached
+            // reads must not be the only place the state was repaired.
+            Connection raw = second.unwrap(Connection.class);
+            Assertions.assertTrue(raw.getAutoCommit(),
+                    "the physical session must be back in auto-commit mode");
+            Assertions.assertFalse(raw.isReadOnly(),
+                    "the physical session must no longer be read-only");
+            Assertions.assertEquals(initialIsolation, raw.getTransactionIsolation(),
+                    "the physical session must be back at its initial isolation level");
+            Assertions.assertEquals(initialCatalog, raw.getCatalog(),
+                    "the physical session must be back at its initial catalog");
+        }
+    }
+
+    @Test
     void theReadOnlyFlagDoesNotOutliveTheBorrower() throws Exception {
         DataSource ds = configuredPool();
         String table = uniqueTable();
