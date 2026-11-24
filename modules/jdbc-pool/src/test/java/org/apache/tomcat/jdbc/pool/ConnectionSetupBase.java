@@ -191,6 +191,46 @@ abstract class ConnectionSetupBase extends JdbcPoolBaseTest {
         Assertions.assertEquals(1, ds.getIdle());
     }
 
+    /**
+     * A session whose borrower ended its transaction with a commit and then
+     * did nothing else has no pending work for the next borrower: the state
+     * interceptor must not pay a rollback round trip on that borrow. The
+     * driver wrapper counts the rollbacks, so a regression to an unconditional
+     * termination is visible here.
+     */
+    @Test
+    void aCommittedTransactionDoesNotForceARollbackOnTheNextBorrow() throws Exception {
+        DataSource ds = newDataSource();
+        ds.setDriverClassName(FailingRestoreDriver.class.getName());
+        ds.getPoolProperties().setJdbcInterceptors(ConnectionState.class.getName());
+        ds.getPoolProperties().setDefaultAutoCommit(Boolean.FALSE);
+        ds.createPool();
+        String t = uniqueTable();
+        try (Connection admin = adminConnection(); Statement st = admin.createStatement()) {
+            st.execute("CREATE TABLE " + t + " (v INT)");
+        }
+        ROLLBACKS.set(0);
+
+        Connection first = ds.getConnection();
+        setSessionMarker(first, 72);
+        try (Statement st = first.createStatement()) {
+            st.executeUpdate("INSERT INTO " + t + " VALUES (1)");
+        }
+        first.commit();
+        first.close();
+        Assertions.assertEquals(0, ROLLBACKS.get(),
+                "the borrower ended its transaction; the return itself must not roll it back");
+
+        try (Connection second = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(72), sessionMarker(second),
+                    "the same physical session must have been reused");
+            Assertions.assertEquals(1, rowCount(second, t),
+                    "the committed work must still be there");
+        }
+        Assertions.assertEquals(0, ROLLBACKS.get(),
+                "a clean session must not pay a rollback on the next borrow");
+    }
+
     @Test
     void anUnusableTransactionIsolationSettingDoesNotBlockThePool() throws Exception {
         DataSource ds = newDataSource();
@@ -653,15 +693,18 @@ abstract class ConnectionSetupBase extends JdbcPoolBaseTest {
                     "the confirmation must clear the phantom transaction with exactly one rollback");
             Assertions.assertEquals(1, ds.getIdle(), "and the session must be back in the idle pool");
 
-            // The confirmed restore cached the state: a later borrow neither
-            // restores nor terminates anything for it.
+            // The confirmed restore cached the state: a later borrow does not
+            // restore it again. The marker read on the previous borrow executed
+            // a statement, so a session left with auto-commit off has work that
+            // the next borrow terminates; in auto-commit mode there is no
+            // transaction to terminate.
             try (Connection later = ds.getConnection()) {
                 Assertions.assertEquals(Integer.valueOf(71), sessionMarker(later),
                         "the later borrow must reuse the same physical session");
                 assertConfiguredDefault(later, method, value);
             }
-            Assertions.assertEquals(1, ROLLBACKS.get(),
-                    "an applied state must not make a later borrow terminate anything");
+            Assertions.assertEquals("setAutoCommit".equals(method) ? 2 : 1, ROLLBACKS.get(),
+                    "an applied state must not make a later borrow restore anything");
         } finally {
             TRANSIENT_STATE_REFUSAL.set(null);
             PHANTOM_TRANSACTION.set(false);

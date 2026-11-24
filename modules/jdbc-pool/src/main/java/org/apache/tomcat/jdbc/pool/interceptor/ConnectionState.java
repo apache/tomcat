@@ -177,18 +177,21 @@ public class ConnectionState extends JdbcInterceptor {
      * cannot be restored; its cached value is dropped on every borrow instead, so a read reaches the driver and
      * reflects the session rather than answering from one borrower's cache.
      * <p>
-     * When any restore is pending, a transaction the previous borrower left open is terminated first: isolation and
-     * read only are transaction scoped on many drivers, an open transaction would absorb the restores, and restoring
-     * auto-commit would silently commit the previous borrower's work. Failing to terminate that transaction, and a
-     * confirmed refusal to restore the read-only, auto-commit or catalog state, fail the borrow and retire the
-     * session - a connection known to sit in a state other than the one the pool hands out must not reach a borrower.
-     * A refusal the driver blames on the session's transaction state is confirmed first, against a session freed of it
-     * ({@link #confirmAgainstFreedSession}).
+     * A transaction the previous borrower left open is terminated before the restores, whether or not one of them is
+     * pending: isolation and read only are transaction scoped on many drivers, an open transaction would absorb the
+     * restores, restoring auto-commit would silently commit the previous borrower's work, and a borrower whose
+     * configured auto-commit is already off triggers no restore at all - yet must not inherit the previous borrower's
+     * uncommitted work. The transaction is rolled back, never committed. The session is only asked to roll back when
+     * the pooled connection reports that work was done since its transaction was last ended
+     * ({@link PooledConnection#isTransactionDirty()}), so a clean session does not pay a rollback round trip on every
+     * borrow. Failing to terminate the transaction, and a confirmed refusal to restore the read-only, auto-commit or
+     * catalog state, fail the borrow and retire the session - a connection known to sit in a state other than the one
+     * the pool hands out must not reach a borrower. A refusal the driver blames on the session's transaction state is
+     * confirmed first, against a session freed of it ({@link #confirmAgainstFreedSession}).
      * <p>
      * A transaction isolation level the driver refuses on a freed session is the one confirmed failure that does not
      * retire the connection: the level is recorded ({@link #refusedIsolationLevel}) and stops counting as a pending
-     * restore, so later borrows neither retry it nor pay a transaction termination on its behalf. When nothing needs
-     * restoring, nothing is terminated.
+     * restore, so later borrows do not retry it.
      *
      * @param parent the pool the connection belongs to, or {@code null} when the interceptor chain is being torn down
      * @param con    the pooled connection being set up for its next borrower
@@ -271,24 +274,29 @@ public class ConnectionState extends JdbcInterceptor {
         boolean resetAutoCommit = targetAutoCommit != null &&
                 (autoCommit == null || autoCommit.booleanValue() != targetAutoCommit.booleanValue());
         boolean resetCatalog = targetCatalogKnown && (catalog == null || !catalog.equals(targetCatalog));
-        if (resetTransactionIsolation || resetReadOnly || resetAutoCommit || resetCatalog) {
-            // The javadoc's terminate-first step. The transaction may have
-            // survived the return, unless the pool was configured to
-            // terminate transactions there; the probe is the same one the
-            // pool's own termination paths use - auto-commit off means a
-            // transaction is open.
-            try {
-                if (raw != null && !raw.getAutoCommit()) {
-                    raw.rollback();
-                }
-            } catch (SQLException x) {
-                // Whether the previous borrower's work survived is unknown,
-                // so the connection must not go to the next borrower.
-                // ConnectionPool.setupConnection() catches this, discards the
-                // connection and fails the borrow.
-                throw new IllegalStateException(
-                        MessageFactory.get("connectionState.unableToTerminatePendingTransaction"), x);
+        // The javadoc's terminate-first step, run on every borrow: with the
+        // previous borrower's auto-commit already matching the target (the
+        // configured default or the initial value) none of the booleans above
+        // is set, yet an open transaction would still be handed on. The
+        // transaction may also have survived the return, unless the pool was
+        // configured to terminate transactions there. The dirty marker says
+        // whether any statement executed since the transaction was last ended:
+        // a clean session cannot hold a transaction, so it is spared the
+        // rollback round trip; an unclean one is probed with the same check
+        // the pool's own termination paths use - auto-commit off means a
+        // transaction is open.
+        try {
+            if (raw != null && con.isTransactionDirty() && !raw.getAutoCommit()) {
+                raw.rollback();
             }
+            con.clearTransactionDirty();
+        } catch (SQLException x) {
+            // Whether the previous borrower's work survived is unknown,
+            // so the connection must not go to the next borrower.
+            // ConnectionPool.setupConnection() catches this, discards the
+            // connection and fails the borrow.
+            throw new IllegalStateException(
+                    MessageFactory.get("connectionState.unableToTerminatePendingTransaction"), x);
         }
         if (resetTransactionIsolation) {
             try {
