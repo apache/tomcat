@@ -621,10 +621,10 @@ public class PageInfo {
             try {
                 @SuppressWarnings("null") // value can't be null here
                 int k = Integer.parseInt(value.substring(0, value.length() - 2));
-                // JSP.7.2.1 requires a positive integer. Values outside this
-                // range are invalid in themselves and would additionally
-                // overflow the multiplication by 1024 below.
-                if (k <= 0 || k > Integer.MAX_VALUE / 1024) {
+                // Zero is a valid size and means no buffering. Negative sizes
+                // are invalid and larger sizes would overflow the
+                // multiplication by 1024 below.
+                if (k < 0 || k > Integer.MAX_VALUE / 1024) {
                     if (n == null) {
                         err.jspError("jsp.error.page.invalid.buffer");
                     } else {

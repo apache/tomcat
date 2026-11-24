@@ -458,6 +458,11 @@
         language specification when <code>expr-a</code> is a literal
         <code>null</code>. (markt)
       </fix>
+      <fix>
+        Accept a page directive buffer size of <code>0kb</code> again. The JSP
+        specification only requires the size to be expressed in kilobytes.
+        Pull request <pr>1271</pr> provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">

@@ -36,13 +36,12 @@ public class TestPageInfo extends TomcatBaseTest {
 
     @Test
     public void testBufferZero() throws Exception {
-        // JSP.7.2.1 requires a positive integer
-        doTestBuffer("zero", 500, "invalid value for buffer");
+        // A buffer size of 0kb is valid and means no buffering
+        doTestBuffer("zero", 200, null);
     }
 
     @Test
     public void testBufferNegative() throws Exception {
-        // JSP.7.2.1 requires a positive integer
         doTestBuffer("negative", 500, "invalid value for buffer");
     }
 
