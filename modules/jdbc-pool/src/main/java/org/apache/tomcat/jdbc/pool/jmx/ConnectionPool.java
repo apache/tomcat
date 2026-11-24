@@ -939,8 +939,13 @@ public class ConnectionPool extends NotificationBroadcasterSupport implements Co
 
 
     /**
-     * @throws UnsupportedOperationException always - the interceptor chain is built when the pool starts and for
-     *             every connection it establishes; set the property before starting the pool
+     * Refuses the write. A live interceptor change is accepted through the data source bean
+     * ({@link org.apache.tomcat.jdbc.pool.DataSourceProxy#setJdbcInterceptors(String)}), which is the authoritative
+     * surface for it: the change applies to chains built for later borrows while existing cached chains keep the list
+     * they were built with. Set the property before starting the pool to affect every connection.
+     *
+     * @throws UnsupportedOperationException always - use the data source bean for a live change, or set the property
+     *             before starting the pool
      */
     @Override
     public void setJdbcInterceptors(String jdbcInterceptors) {

@@ -48,6 +48,13 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * their changes under this instance's monitor, which is also the monitor {@link #clone()} and serialization take.
  * Those setters are the snapshot boundary for the state they own. Setters that assign a single plain field do not take
  * the monitor, so a copy taken under it is not a consistent snapshot of those fields against a concurrent write.
+ * <p>
+ * This class is a programmatic configuration surface and returns raw configured values: {@link #getPassword()},
+ * {@link #getUrl()}, {@link #getConnectionProperties()}, {@link #getJdbcInterceptors()} and the database-properties
+ * entries are not masked here. The bean ({@link DataSourceProxy}) and JMX
+ * ({@link org.apache.tomcat.jdbc.pool.jmx.ConnectionPool}) surfaces that publish the same configuration mask
+ * credentials for display; code that exposes configuration across a security boundary should use those masked
+ * accessors rather than this object.
  */
 public class PoolProperties implements PoolConfiguration, Cloneable, Serializable {
 

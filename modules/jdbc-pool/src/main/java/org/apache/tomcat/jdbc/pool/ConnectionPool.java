@@ -436,8 +436,14 @@ public class ConnectionPool {
      * The view answers reads from the mutable configuration builder the bean and JMX surfaces write, and routes writes
      * through {@link #applyConfigurationChange(PoolConfiguration)}. The connect and credential paths read the
      * immutable snapshot the apply publishes, so a rotation or other update is atomic for a connection being
-     * established. A mutable value returned by one of the view's getters is a copy: changing it does not reconfigure
-     * the pool.
+     * established. The mutable collections returned by the view's getters are copies: changing a returned database
+     * properties collection or interceptor definition does not reconfigure the pool. The configured data source and
+     * validator are returned as the live objects.
+     * <p>
+     * The view's programmatic getters return raw values, including credentials. The bean and JMX surfaces that publish
+     * the same configuration mask those values for display, so this view is a trusted programmatic API rather than a
+     * display surface. Its {@code toString()} renders the published snapshot, so a concurrent write can briefly make
+     * it differ from the getters.
      *
      * @return PoolConfiguration
      */
@@ -793,11 +799,12 @@ public class ConnectionPool {
     }
 
     /**
-     * Closes the pool and all disconnects all idle connections Active connections will be closed upon the
-     * {@link java.sql.Connection#close close} method is called on the underlying connection instead of being returned
-     * to the pool
+     * Closes the pool and disconnects all idle connections. With {@code force} true, active connections are
+     * disconnected as well; otherwise they are closed when their borrower calls {@link java.sql.Connection#close()}
+     * instead of being returned to the pool. A forced close that arrives after the pool has already been closed still
+     * disconnects the remaining active connections.
      *
-     * @param force - true to even close the active connections
+     * @param force {@code true} to close the active connections as well
      */
     protected void close(boolean force) {
         // Claim the closure atomically. Two callers that observe the open state

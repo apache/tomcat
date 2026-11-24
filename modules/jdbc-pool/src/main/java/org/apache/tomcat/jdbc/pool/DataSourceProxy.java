@@ -871,6 +871,13 @@ public class DataSourceProxy implements PoolConfiguration {
     }
 
 
+    /**
+     * Sets the interceptor list. This is the authoritative surface for a live write: a pool that has already started
+     * applies the new list to the chains it builds for later borrows, while connections that already have a cached
+     * chain keep it. The pool's JMX MBean refuses this attribute and points an operator here.
+     *
+     * @param interceptors the interceptor list
+     */
     @Override
     public void setJdbcInterceptors(String interceptors) {
         this.getPoolProperties().setJdbcInterceptors(interceptors);
