@@ -205,6 +205,7 @@ public class ConnectionPool {
      */
     private volatile int startedInterceptorCount = 0;
 
+
     /**
      * Since newProxyInstance performs the same operation, over and over again, it is much more optimized if we simply
      * store the constructor ourselves. One constructor is cached per proxy kind (with and without the XAConnection
@@ -1314,8 +1315,21 @@ public class ConnectionPool {
         if (properties == configurationView) {
             return;
         }
+        String previousInterceptors = configurationSnapshot == null
+                ? null : configurationSnapshot.getJdbcInterceptors();
         checkPoolConfiguration(properties);
         configurationSnapshot = copyConfiguration(properties);
+        // A live interceptor change must get the same order diagnostic the
+        // start got. Only a changed list is checked, so unrelated writes do
+        // not repeat a warning. A malformed list is left for the borrow that
+        // tries to build a chain from it, as before.
+        if (!Objects.equals(previousInterceptors, configurationSnapshot.getJdbcInterceptors())) {
+            try {
+                checkInterceptorOrder(configurationSnapshot.getJdbcInterceptorsAsArray());
+            } catch (Throwable x) {
+                ExceptionUtils.handleThrowable(x);
+            }
+        }
         if (closed) {
             terminatePoolCleaner();
         } else {
