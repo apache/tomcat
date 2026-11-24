@@ -157,6 +157,37 @@ abstract class CloseVsConcurrentReleaseBase {
         return new CountingPool(props);
     }
 
+    private static CountingPool countingPool(Recording rec, CountDownLatch inside, CountDownLatch proceed)
+            throws SQLException {
+        PoolProperties props = new PoolProperties();
+        props.setJmxEnabled(false);
+        props.setInitialSize(0);
+        props.setTimeBetweenEvictionRunsMillis(-1);
+        props.setValidationInterval(0);
+        props.setDataSource(Proxy.newProxyInstance(CloseVsConcurrentReleaseBase.class.getClassLoader(),
+                new Class<?>[] { javax.sql.DataSource.class }, (proxy, method, args) -> {
+                    switch (method.getName()) {
+                        case "getConnection" :
+                            inside.countDown();
+                            try {
+                                proceed.await(10, TimeUnit.SECONDS);
+                            } catch (InterruptedException x) {
+                                throw new SQLException(x);
+                            }
+                            return recordingConnection(rec);
+                        case "equals" :
+                            return Boolean.valueOf(proxy == args[0]);
+                        case "hashCode" :
+                            return Integer.valueOf(System.identityHashCode(proxy));
+                        case "toString" :
+                            return "parked-recording-datasource";
+                        default :
+                            return defaultValue(method.getReturnType());
+                    }
+                }));
+        return new CountingPool(props);
+    }
+
     @Test
     void aSecondReleaseDuringTheTerminalSequenceActsOnNothing() throws Exception {
         Recording rec = new Recording();
@@ -217,6 +248,130 @@ abstract class CloseVsConcurrentReleaseBase {
         Assertions.assertFalse(releaser.isAlive(), "the first release must complete");
         Assertions.assertEquals(1, pool.disconnectEvents.get(),
                 "the refused connect must have added nothing to the terminal sequence");
+    }
+
+    private static CountingPool countingPoolWithSecondConnectParked(Recording rec, CountDownLatch inside,
+            CountDownLatch proceed) throws SQLException {
+        AtomicInteger calls = new AtomicInteger();
+        PoolProperties props = new PoolProperties();
+        props.setJmxEnabled(false);
+        props.setInitialSize(0);
+        props.setTimeBetweenEvictionRunsMillis(-1);
+        props.setValidationInterval(0);
+        props.setDataSource(Proxy.newProxyInstance(CloseVsConcurrentReleaseBase.class.getClassLoader(),
+                new Class<?>[] { javax.sql.DataSource.class }, (proxy, method, args) -> {
+                    switch (method.getName()) {
+                        case "getConnection" :
+                            if (calls.getAndIncrement() == 0) {
+                                return recordingConnection(rec);
+                            }
+                            inside.countDown();
+                            try {
+                                proceed.await(10, TimeUnit.SECONDS);
+                            } catch (InterruptedException x) {
+                                throw new SQLException(x);
+                            }
+                            return recordingConnection(rec);
+                        case "equals" :
+                            return Boolean.valueOf(proxy == args[0]);
+                        case "hashCode" :
+                            return Integer.valueOf(System.identityHashCode(proxy));
+                        case "toString" :
+                            return "parked-second-connect-recording-datasource";
+                        default :
+                            return defaultValue(method.getReturnType());
+                    }
+                }));
+        return new CountingPool(props);
+    }
+
+    @Test
+    void aConnectInFlightWhenAReleaseWinsMustNotLeaveAReopenedSession() throws Exception {
+        Recording rec = new Recording();
+        CountDownLatch inside = new CountDownLatch(1);
+        CountDownLatch proceed = new CountDownLatch(1);
+        CountingPool pool = countingPool(rec, inside, proceed);
+        PooledConnection con = new PooledConnection(pool.props, pool);
+
+        Thread connector = new Thread(() -> {
+            try {
+                con.connect();
+            } catch (SQLException expected) {
+                // The release may make the connect fail; the final state is
+                // what this test checks.
+            }
+        }, "connector");
+        connector.start();
+        Assertions.assertTrue(inside.await(10, TimeUnit.SECONDS),
+                "the connect must be parked inside the driver");
+
+        Thread releaser = new Thread(() -> pool.release(con), "releaser");
+        releaser.start();
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        while (System.nanoTime() < deadline) {
+            Thread.State state = releaser.getState();
+            if (state == Thread.State.BLOCKED || !releaser.isAlive()) {
+                break;
+            }
+            Thread.sleep(1);
+        }
+
+        proceed.countDown();
+        connector.join(TimeUnit.SECONDS.toMillis(10));
+        releaser.join(TimeUnit.SECONDS.toMillis(10));
+        Assertions.assertFalse(connector.isAlive(), "the connect must complete");
+        Assertions.assertFalse(releaser.isAlive(), "the release must complete");
+
+        Assertions.assertTrue(con.isReleased(), "the release must win the lifecycle claim");
+        Assertions.assertNull(con.getConnection(),
+                "a release that won while a connect was in flight must not leave a live session behind");
+        Assertions.assertFalse(con.release(), "the release already owns the connection");
+        Assertions.assertEquals(1, rec.closeCalls.get(),
+                "the session produced by the in-flight connect must be physically closed once");
+        Assertions.assertEquals(1, pool.disconnectEvents.get(),
+                "the terminal notice must have gone through the chain once");
+    }
+
+    @Test
+    void aReconnectWithInFlightWhenAReleaseWinsMustCloseBothSessions() throws Exception {
+        Recording rec = new Recording();
+        CountDownLatch inside = new CountDownLatch(1);
+        CountDownLatch proceed = new CountDownLatch(1);
+        CountingPool pool = countingPoolWithSecondConnectParked(rec, inside, proceed);
+        PooledConnection con = connectedTo(pool);
+
+        Thread reconnector = new Thread(() -> {
+            try {
+                con.reconnectWith(null, null);
+            } catch (SQLException expected) {
+                // The release may make the reconnect fail; the final state is
+                // what this test checks.
+            }
+        }, "reconnector");
+        reconnector.start();
+        Assertions.assertTrue(inside.await(10, TimeUnit.SECONDS),
+                "the replacement connect must be parked inside the driver");
+
+        Thread releaser = new Thread(() -> pool.release(con), "releaser");
+        releaser.start();
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        while (System.nanoTime() < deadline && releaser.isAlive()
+                && releaser.getState() != Thread.State.BLOCKED) {
+            Thread.sleep(1);
+        }
+
+        proceed.countDown();
+        reconnector.join(TimeUnit.SECONDS.toMillis(10));
+        releaser.join(TimeUnit.SECONDS.toMillis(10));
+        Assertions.assertFalse(reconnector.isAlive(), "the reconnect with must complete");
+        Assertions.assertFalse(releaser.isAlive(), "the release must complete");
+
+        Assertions.assertTrue(con.isReleased(), "the release must win the lifecycle claim");
+        Assertions.assertNull(con.getConnection(),
+                "a release that won during reconnectWith must not leave either session in the released object");
+        Assertions.assertFalse(con.release(), "the release already owns the connection");
+        Assertions.assertEquals(2, rec.closeCalls.get(),
+                "the served session and the session produced by the in-flight reconnect must both be closed");
     }
 
     @Test
