@@ -152,4 +152,38 @@ abstract class LiveConfigurationSnapshotBase {
             pool.close(true);
         }
     }
+
+    @Test
+    void theInterceptorDefinitionsHandedOutByTheViewAreCopies() throws Exception {
+        PoolProperties props = properties();
+        props.setJdbcInterceptors("StatementFinalizer(trace=true)");
+        ConnectionPool pool = new ConnectionPool(props);
+        try {
+            PoolConfiguration view = pool.getPoolProperties();
+            PoolProperties.InterceptorDefinition[] definitions = view.getJdbcInterceptorsAsArray();
+            PoolProperties.InterceptorDefinition target = null;
+            for (PoolProperties.InterceptorDefinition definition : definitions) {
+                if (definition.getClassName().contains("StatementFinalizer")) {
+                    target = definition;
+                    break;
+                }
+            }
+            Assertions.assertNotNull(target, "the configured interceptor must be in the returned array");
+            target.addProperty("injected", "yes");
+
+            PoolProperties.InterceptorDefinition[] again = view.getJdbcInterceptorsAsArray();
+            boolean injected = false;
+            for (PoolProperties.InterceptorDefinition definition : again) {
+                if (definition.getClassName().contains("StatementFinalizer")
+                        && definition.getProperties().containsKey("injected")) {
+                    injected = true;
+                    break;
+                }
+            }
+            Assertions.assertFalse(injected,
+                    "a caller changing a definition returned by the view must not change the pool configuration");
+        } finally {
+            pool.close(true);
+        }
+    }
 }
