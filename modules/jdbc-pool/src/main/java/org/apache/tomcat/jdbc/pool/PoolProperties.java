@@ -58,9 +58,22 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     private static final String PASSWORD_MASK = "********";
 
     /**
-     * Constructs a PoolProperties with default values.
+     * Constructs a PoolProperties with default values and a generated default pool name. The counter makes the names of
+     * programmatically built pools distinct within this class loader; container-managed pools are given their own name
+     * before they start.
      */
     public PoolProperties() {
+        this("Tomcat Connection Pool[" + (poolCounter.addAndGet(1)) + "]");
+    }
+
+    /**
+     * Constructs a PoolProperties carrying the given name without consuming a default-name counter value. Snapshot
+     * copies use this: they carry the source configuration's name and are not pools of their own.
+     *
+     * @param name the pool name, possibly {@code null}
+     */
+    private PoolProperties(String name) {
+        this.name = name;
     }
 
     /**
@@ -133,16 +146,13 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
     /** Whether to log abandoned connections. */
     private volatile boolean logAbandoned = false;
     /**
-     * The pool name. This default is the fallback for a pool nobody named: a
-     * container-managed pool is given a name of its own before it starts, so
-     * what is left to name here is a pool built programmatically, once per
-     * {@code PoolProperties} instance. The counter is what makes those names
-     * distinct within this class loader; upstream's default also carried the
-     * identity hash of this class object, which identifies only the class
-     * loader that loaded it - the same value for every pool in a JVM - and so
-     * is not in the name any more.
+     * The pool name. A programmatically built configuration receives a generated default in its constructor; a
+     * snapshot copy carries the source configuration's name instead. The counter is what makes the generated names
+     * distinct within this class loader; upstream's default also carried the identity hash of this class object, which
+     * identifies only the class loader that loaded it - the same value for every pool in a JVM - and so is not in the
+     * name any more.
      */
-    private volatile String name = "Tomcat Connection Pool[" + (poolCounter.addAndGet(1)) + "]";
+    private volatile String name;
     /** The database password. */
     private volatile String password;
     /**
@@ -2493,7 +2503,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         // through a reconfiguration, or a string paired with the definitions
         // of another generation.
         synchronized (from) {
-            PoolProperties copy = new PoolProperties();
+            PoolProperties copy = new PoolProperties(from.name);
             copy.dbProperties = from.dbProperties == null ? null : PoolUtilities.clone(from.dbProperties);
             copy.url = from.url;
             copy.driverClassName = from.driverClassName;
@@ -2523,7 +2533,6 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             copy.removeAbandoned = from.removeAbandoned;
             copy.removeAbandonedTimeout = from.removeAbandonedTimeout;
             copy.logAbandoned = from.logAbandoned;
-            copy.name = from.name;
             copy.password = from.password;
             copy.passwordCleared = from.passwordCleared;
             copy.username = from.username;

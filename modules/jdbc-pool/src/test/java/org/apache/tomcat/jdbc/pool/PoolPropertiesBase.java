@@ -260,6 +260,21 @@ abstract class PoolPropertiesBase {
     }
 
     @Test
+    void aSnapshotCopyDoesNotConsumeADefaultPoolName() {
+        int before = PoolProperties.getPoolCounter();
+        PoolProperties source = new PoolProperties();
+        Assertions.assertEquals(before + 1, PoolProperties.getPoolCounter(),
+                "precondition: constructing a configuration consumes one default name");
+
+        PoolProperties copy = PoolProperties.copyOf(source);
+
+        Assertions.assertEquals(before + 1, PoolProperties.getPoolCounter(),
+                "a snapshot copy carries the source's name and must not consume another default name");
+        Assertions.assertEquals(source.getPoolName(), copy.getPoolName(),
+                "the copy must carry the source's pool name");
+    }
+
+    @Test
     void getJdbcInterceptorsAsArrayReturnsACopy() {
         PoolProperties properties = new PoolProperties();
         properties.setJdbcInterceptors("ResetAbandonedTimer");
