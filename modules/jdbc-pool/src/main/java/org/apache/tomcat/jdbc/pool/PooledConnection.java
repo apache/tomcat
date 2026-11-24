@@ -386,6 +386,25 @@ public class PooledConnection implements PooledConnectionMBean {
      * @return <code>true</code> if a {@link ConnectionState} interceptor is configured
      */
     private boolean hasConnectionStateInterceptor() {
+        // Once a chain has been built, the connection keeps it for its whole
+        // life; a live jdbcInterceptors change only affects chains built
+        // later. The decision must therefore be made on the chain this
+        // connection actually runs, not on the current configuration, or a
+        // connection with a cached chain that lacks ConnectionState would
+        // skip the defaults at reconnect because the configuration now lists
+        // the interceptor that the cached chain does not contain.
+        JdbcInterceptor interceptor = handler;
+        if (interceptor != null) {
+            while (interceptor != null) {
+                if (interceptor instanceof ConnectionState) {
+                    return true;
+                }
+                interceptor = interceptor.getNext();
+            }
+            return false;
+        }
+        // A connection with no chain yet will build one from the current
+        // configuration during setup.
         for (PoolProperties.InterceptorDefinition definition : configuration().getJdbcInterceptorsAsArray()) {
             try {
                 if (ConnectionState.class.isAssignableFrom(definition.getInterceptorClass())) {
