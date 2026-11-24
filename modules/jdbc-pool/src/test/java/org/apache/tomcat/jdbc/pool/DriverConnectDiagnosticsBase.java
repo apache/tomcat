@@ -94,6 +94,20 @@ abstract class DriverConnectDiagnosticsBase extends JdbcPoolBaseTest {
             }
         }
 
+        /** The driver failure line must be logged exactly once and must stay on one line. */
+        void assertDriverFailureLineIsSingleLine() {
+            int found = 0;
+            for (LogRecord record : records.toArray(new LogRecord[0])) {
+                String message = record.getMessage();
+                if (message != null && message.startsWith("Unable to connect to database.")) {
+                    found++;
+                    Assertions.assertFalse(message.indexOf('\r') >= 0 || message.indexOf('\n') >= 0,
+                            "a driver failure message must not forge a log line, was: " + message);
+                }
+            }
+            Assertions.assertEquals(1, found, "the failed connect must log exactly one driver failure line");
+        }
+
 
     }
 
@@ -245,6 +259,23 @@ abstract class DriverConnectDiagnosticsBase extends JdbcPoolBaseTest {
             Assertions.assertThrows(SQLException.class, ds::getConnection,
                     "the driver failure must be reported");
             log.assertNothingLoggedCarries(secret);
+        }
+    }
+
+    @Test
+    void aDriverFailureMessageWithALineBreakIsFlattenedInTheDebugLine() throws Exception {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl("jdbc:failing:thin:@dbhost\nforged");
+        properties.setDriverClassName(FailingDriver.class.getName());
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(0);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        DataSource ds = manage(new DataSource(properties));
+
+        try (ConnectionLogCapture log = new ConnectionLogCapture()) {
+            Assertions.assertThrows(SQLException.class, ds::getConnection,
+                    "the driver failure must be reported");
+            log.assertDriverFailureLineIsSingleLine();
         }
     }
 

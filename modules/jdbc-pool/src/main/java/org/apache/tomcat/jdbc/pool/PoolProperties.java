@@ -1151,14 +1151,18 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                     PoolProperties.class.getClassLoader(), Thread.currentThread().getContextClassLoader());
             validator = validatorClass.getConstructor().newInstance();
         } catch (ClassNotFoundException e) {
-            log.warn(MessageFactory.get("poolProperties.validatorClassNotFound", className), e);
+            log.warn(MessageFactory.get("poolProperties.validatorClassNotFound",
+                    PoolUtilities.maskAndFlatten(className)), PoolUtilities.maskCredentials(e));
         } catch (ClassCastException e) {
-            log.warn(MessageFactory.get("poolProperties.validatorNotValidator", className), e);
+            log.warn(MessageFactory.get("poolProperties.validatorNotValidator",
+                    PoolUtilities.maskAndFlatten(className)), PoolUtilities.maskCredentials(e));
         } catch (IllegalAccessException e) {
-            log.warn(MessageFactory.get("poolProperties.validatorInaccessible", className), e);
+            log.warn(MessageFactory.get("poolProperties.validatorInaccessible",
+                    PoolUtilities.maskAndFlatten(className)), PoolUtilities.maskCredentials(e));
         } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
             ExceptionUtils.handleThrowable(ExceptionUtils.unwrapInvocationTargetException(e));
-            log.warn(MessageFactory.get("poolProperties.validatorCannotInstantiate", className), e);
+            log.warn(MessageFactory.get("poolProperties.validatorCannotInstantiate",
+                    PoolUtilities.maskAndFlatten(className)), PoolUtilities.maskCredentials(e));
         }
 
         if (validator == null) {
@@ -1168,7 +1172,8 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
             // while validation in fact runs on the query path. Left at the
             // warning alone, that disagreement is invisible in the default
             // log.
-            log.error(MessageFactory.get("poolProperties.validatorNotInEffect", className));
+            log.error(MessageFactory.get("poolProperties.validatorNotInEffect",
+                    PoolUtilities.maskAndFlatten(className)));
         }
     }
 
@@ -1373,7 +1378,7 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
      */
     private static void appendError(StringBuilder buf, Throwable failure) {
         try {
-            buf.append("<error: ").append(sanitizeForLog(String.valueOf(failure))).append('>');
+            buf.append("<error: ").append(PoolUtilities.maskAndFlatten(String.valueOf(failure))).append('>');
         } catch (Throwable hostile) {
             // A Throwable whose own toString() throws must cost only its own
             // field, not every field after it: fall back to its class name.

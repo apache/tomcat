@@ -179,6 +179,24 @@ public class PoolUtilities {
     }
 
     /**
+     * Masks any credentials in a diagnostic text and flattens carriage returns and line feeds, so third-party or
+     * application-shaped text cannot leak a credential or forge additional log lines. This is the common shape of the
+     * module's log diagnostics: the configuration dump and the pool's messages use it for every value that may come
+     * from outside the pool's own code.
+     *
+     * @param value the raw text, possibly {@code null}
+     *
+     * @return the masked and flattened text, or {@code null} when the input is {@code null}
+     */
+    public static String maskAndFlatten(String value) {
+        String masked = PoolProperties.maskCredentials(value);
+        if (masked == null || (masked.indexOf('\r') < 0 && masked.indexOf('\n') < 0)) {
+            return masked;
+        }
+        return masked.replace('\r', ' ').replace('\n', ' ');
+    }
+
+    /**
      * Returns a copy of a throwable whose message - and the messages of its suppressed throwables and causes - carry
      * no configured credentials. The stack frames are preserved. A diagnostic that has to include a driver or wrapper
      * failure without trusting the text that failure carries uses this copy for its log record.

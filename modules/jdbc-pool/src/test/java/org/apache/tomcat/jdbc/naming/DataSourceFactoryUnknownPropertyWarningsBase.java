@@ -184,6 +184,18 @@ abstract class DataSourceFactoryUnknownPropertyWarningsBase extends JdbcPoolBase
     }
 
     @Test
+    void aLineBreakInAnUnknownPropertyNameDoesNotForgeTheWarning() throws Exception {
+        ParsingFactory factory = new ParsingFactory();
+        Reference ref = dataSourceReference();
+        ref.add(new StringRefAddr("maxactive\nforged", "500"));
+
+        try (FactoryLogCapture logs = new FactoryLogCapture()) {
+            factory.getObjectInstance(ref, new CompositeName("jdbc/TestDS"), null, null);
+            logs.assertWarnedIgnoredExactlyOnce("maxactive forged");
+        }
+    }
+
+    @Test
     void containerManagedAddressesAreNotReportedAsUnknown() throws Exception {
         // The exact addresses a Tomcat Resource reference carries on top of
         // the configured attributes: ResourceRef adds description, scope,

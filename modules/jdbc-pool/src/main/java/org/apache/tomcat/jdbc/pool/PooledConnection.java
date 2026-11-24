@@ -632,8 +632,9 @@ public class PooledConnection implements PooledConnectionMBean {
                         // is a standard support step, so a URL that carries
                         // its credential inline must reach this line masked
                         // as well - the driver is handed the real URL below.
-                        log.debug("Instantiating driver using class: " + configuredDriver +
-                                " [url=" + PoolProperties.maskCredentials(configuration.getUrl()) + "]");
+                        log.debug("Instantiating driver using class: " +
+                                PoolUtilities.maskAndFlatten(configuredDriver) +
+                                " [url=" + PoolUtilities.maskAndFlatten(configuration.getUrl()) + "]");
                     }
                     driver = (java.sql.Driver) ClassLoaderUtil.loadClass(configuredDriver,
                             PooledConnection.class.getClassLoader(), Thread.currentThread().getContextClassLoader())
@@ -740,7 +741,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 // failure this line exists to diagnose, so it is masked and
                 // logged without the raw exception.
                 log.debug("Unable to connect to database. " + x.getClass().getName() + ": " +
-                        PoolProperties.maskCredentials(x.getMessage()));
+                        PoolUtilities.maskAndFlatten(x.getMessage()));
             }
             // Read the pool's JMX object only once: close() gives it up
             // concurrently, and a second read can observe the null the first
