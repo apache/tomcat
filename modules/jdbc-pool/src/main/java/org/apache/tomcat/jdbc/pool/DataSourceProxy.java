@@ -304,11 +304,13 @@ public class DataSourceProxy implements PoolConfiguration {
                         // only once a pool is reachable. The check has to come
                         // before the cleaner is looked over: it decides the
                         // interval the cleaner should be running on. Both use
-                        // the configuration this construction was built from, not
-                        // whatever the shared field might hold by now.
-                        fresh.checkPoolConfiguration(configuration);
-                        fresh.reconcilePoolCleaner(configuration);
-                        fresh.publishConfiguration(configuration);
+                        // the pool's own builder, the private copy this
+                        // construction was built from, not the caller's object
+                        // or whatever the shared field might hold by now.
+                        PoolConfiguration built = fresh.getMutableConfiguration();
+                        fresh.checkPoolConfiguration(built);
+                        fresh.reconcilePoolCleaner(built);
+                        fresh.publishConfiguration(built);
                         pool = fresh;
                         // The bean surface now reads and writes through the
                         // pool's live view: reads come from the immutable
