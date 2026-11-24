@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.io.PrintWriter;
+import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -60,6 +61,15 @@ public class DataSourceProxy implements PoolConfiguration {
      * published any more and creation fails with an {@link SQLException}.
      */
     private volatile boolean closed = false;
+
+    /**
+     * The pool the first close took out of {@link #pool}, held weakly so a later
+     * {@link #close(boolean)} can escalate a graceful close to a forced one. A weak reference does not keep a
+     * closed pool alive on its own; while in-use sessions remain they hold their pool through their pooled
+     * connections, so a forced request can still reach it, and after the sessions are gone there is nothing left
+     * to force.
+     */
+    private volatile WeakReference<ConnectionPool> closedPool = null;
 
     /**
      * Whether a pool construction is in progress, guarded by this data source's monitor. The start-time setters take
@@ -541,6 +551,13 @@ public class DataSourceProxy implements PoolConfiguration {
         closed = true;
         final ConnectionPool p = pool;
         pool = null;
+        if (p != null) {
+            // Keep a weak handle on the pool the graceful close is draining, so
+            // a later forced close can escalate it. A pool with in-use sessions
+            // stays reachable through their pooled connections; a pool with
+            // nothing left can be collected, and there is nothing to force.
+            closedPool = new WeakReference<>(p);
+        }
         if (p != null && poolProperties == p.getPoolProperties()) {
             // The live view holds the pool it belongs to. Keeping it in this
             // field after the pool is taken would keep the closed pool and its
@@ -559,12 +576,24 @@ public class DataSourceProxy implements PoolConfiguration {
      * not propagated: the closure already happened when the flag was set, and one failing session must not stop
      * the rest from being disconnected or hide the closure from the caller.
      *
-     * @param p   the pool to close, or {@code null} to close nothing
+     * A {@code null} pool is the second or later close: the first close already took the pool from this data source.
+     * A forced request then escalates the graceful close through the weakly held closed pool, while a graceful
+     * request has nothing left to do. The escalation runs the forced drain without repeating the one-time terminal
+     * work, which belongs to the close that claimed the pool.
+     *
+     * @param p   the pool to close, or {@code null} when an earlier close already took it
      * @param all if true close all connections, otherwise only idle ones
      */
     protected void closePool(ConnectionPool p, boolean all) {
         if (p == null) {
-            return;
+            if (!all) {
+                return;
+            }
+            WeakReference<ConnectionPool> reference = closedPool;
+            p = reference == null ? null : reference.get();
+            if (p == null) {
+                return;
+            }
         }
         try {
             p.close(all);
