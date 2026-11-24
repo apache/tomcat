@@ -261,7 +261,9 @@ abstract class PoolSizeSetterValidationBase extends JdbcPoolBaseTest {
         org.apache.tomcat.jdbc.pool.jmx.ConnectionPool jmx = ds.getPool().getJmxPool();
         Assertions.assertNotNull(jmx, "precondition: a pool created with JMX enabled exposes its MBean");
 
-        properties.armed = true;
+        OverlapDetectingProperties live = (OverlapDetectingProperties)
+                ds.getPool().getMutableConfiguration();
+        live.armed = true;
         CountDownLatch start = new CountDownLatch(1);
         Thread dataSourceWriter = new Thread(() -> {
             try {
@@ -286,7 +288,7 @@ abstract class PoolSizeSetterValidationBase extends JdbcPoolBaseTest {
         start.countDown();
         dataSourceWriter.join(TimeUnit.SECONDS.toMillis(10));
         mbeanWriter.join(TimeUnit.SECONDS.toMillis(10));
-        properties.armed = false;
+        live.armed = false;
 
         Assertions.assertEquals(1, properties.maxConcurrent.get(),
                 "a configuration check on one management surface must not run inside the"
