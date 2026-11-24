@@ -73,10 +73,10 @@ public class XADataSource extends DataSource implements javax.sql.XADataSource {
      * silently, on a session that does not carry it.
      * <p>
      * The connection obtained from the returned handle's
-     * {@link javax.sql.PooledConnection#getConnection()} is the driver's raw logical session, not a pool-managed
-     * connection: the pool's interceptors and features do not apply to it, and closing it invalidates the session
-     * under the pool's own notion of a live connection. Release the borrowed session by closing the handle, not that
-     * connection.
+     * {@link javax.sql.PooledConnection#getConnection()} is the pooled handle itself, the logical connection of this
+     * borrow: closing it returns the session to the pool, exactly as closing the handle does, and the statements
+     * created through it pass through the pool's interceptor chain. The raw driver session is never exposed through
+     * that accessor.
      */
     @Override
     public XAConnection getXAConnection() throws SQLException {

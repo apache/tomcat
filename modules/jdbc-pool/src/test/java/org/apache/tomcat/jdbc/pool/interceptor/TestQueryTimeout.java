@@ -43,7 +43,7 @@ class TestQueryTimeout {
     }
 
     @Nested
-    class QueryTimeoutXaBypassWarning extends QueryTimeoutXaBypassWarningBase {
+    class QueryTimeoutXaConnection extends QueryTimeoutXaConnectionBase {
     }
 
 }
