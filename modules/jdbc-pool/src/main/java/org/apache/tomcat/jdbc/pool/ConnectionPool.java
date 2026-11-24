@@ -2964,17 +2964,6 @@ public class ConnectionPool {
     }
 
     /**
-     * Creates a stack trace representing the existing thread's current state.
-     *
-     * @return a string object representing the current state.
-     */
-    protected static String getThreadDump() {
-        Exception x = new Exception();
-        x.fillInStackTrace();
-        return getStackTrace(x);
-    }
-
-    /**
      * Captures the existing thread's current state without formatting it. An abandoned connection reports the borrow
      * site only rarely, so the formatting is left to {@link PooledConnection#getStackTrace()} and a borrow that is
      * never reported never pays for a thread dump.
