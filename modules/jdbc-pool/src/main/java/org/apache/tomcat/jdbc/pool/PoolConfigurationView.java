@@ -97,7 +97,19 @@ final class PoolConfigurationView {
             }
             if ("getJdbcInterceptorsAsArray".equals(name)
                     && result instanceof PoolProperties.InterceptorDefinition[]) {
-                return ((PoolProperties.InterceptorDefinition[]) result).clone();
+                // A shallow array clone would share the live definitions with
+                // the builder, letting a caller add or replace an interceptor
+                // property behind the apply path's back. Deep-copy the
+                // definitions instead, keeping the configured class name and
+                // property values but sharing no mutable state.
+                PoolProperties.InterceptorDefinition[] source =
+                        (PoolProperties.InterceptorDefinition[]) result;
+                PoolProperties.InterceptorDefinition[] copies =
+                        new PoolProperties.InterceptorDefinition[source.length];
+                for (int i = 0; i < source.length; i++) {
+                    copies[i] = source[i] == null ? null : source[i].copy();
+                }
+                return copies;
             }
             return result;
         }
