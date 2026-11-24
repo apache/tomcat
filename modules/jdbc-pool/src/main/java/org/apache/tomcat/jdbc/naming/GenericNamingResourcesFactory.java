@@ -172,7 +172,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     // The property simply could not be converted or no usable
                     // setter was found; a matched setter that failed has
                     // already been reported by setProperty with its cause.
-                    log.warn(MessageFactory.get("genericNamingResourcesFactory.propertyNotApplied", param, type));
+                    log.warn(MessageFactory.get("genericNamingResourcesFactory.propertyNotApplied",
+                            PoolUtilities.maskAndFlatten(param), PoolUtilities.maskAndFlatten(type)));
                 }
             }
         }
@@ -300,15 +301,18 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
         } catch (IllegalArgumentException ex2) {
             log.warn(MessageFactory.get("genericNamingResourcesFactory.unableToSetProperty",
-                    name, o.getClass().getName()), PoolUtilities.maskCredentials(ex2));
+                    PoolUtilities.maskAndFlatten(name), PoolUtilities.maskAndFlatten(o.getClass().getName())),
+                    PoolUtilities.maskCredentials(ex2));
             return SetResult.REPORTED;
         } catch (SecurityException ex1) {
             log.warn(MessageFactory.get("genericNamingResourcesFactory.securityExceptionSettingProperty",
-                    name, o.getClass().getName()), PoolUtilities.maskCredentials(ex1));
+                    PoolUtilities.maskAndFlatten(name), PoolUtilities.maskAndFlatten(o.getClass().getName())),
+                    PoolUtilities.maskCredentials(ex1));
             return SetResult.REPORTED;
         } catch (IllegalAccessException iae) {
             log.warn(MessageFactory.get("genericNamingResourcesFactory.illegalAccessExceptionSettingProperty",
-                    name, o.getClass().getName()), PoolUtilities.maskCredentials(iae));
+                    PoolUtilities.maskAndFlatten(name), PoolUtilities.maskAndFlatten(o.getClass().getName())),
+                    PoolUtilities.maskCredentials(iae));
             return SetResult.REPORTED;
         } catch (InvocationTargetException ie) {
             // ExceptionUtils.handleThrowable() propagates the fatal
@@ -319,7 +323,8 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             Throwable cause = ie.getCause();
             ExceptionUtils.handleThrowable(cause);
             log.warn(MessageFactory.get("genericNamingResourcesFactory.setterThrew",
-                    name, o.getClass().getName()), PoolUtilities.maskCredentials(ie));
+                    PoolUtilities.maskAndFlatten(name), PoolUtilities.maskAndFlatten(o.getClass().getName())),
+                    PoolUtilities.maskCredentials(ie));
             return SetResult.REPORTED;
         }
         return SetResult.UNREPORTED;
@@ -411,7 +416,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                         return InetAddress.getByName(value);
                     } catch (UnknownHostException exc) {
                         if (log.isDebugEnabled()) {
-                            log.debug("Unable to resolve host name: " + value);
+                            log.debug("Unable to resolve host name: " + PoolUtilities.maskAndFlatten(value));
                         }
                     }
                 }

@@ -178,7 +178,8 @@ public class DataSourceProxy implements PoolConfiguration {
             return createPool().getConnection(username, password);
         } else {
             if (connectionWithoutCredentialsWarningIssued.compareAndSet(false, true)) {
-                log.warn(MessageFactory.get("dataSourceProxy.alternateUsernameIgnored", username));
+                log.warn(MessageFactory.get("dataSourceProxy.alternateUsernameIgnored",
+                        PoolUtilities.maskAndFlatten(username)));
             }
             return getConnection();
         }

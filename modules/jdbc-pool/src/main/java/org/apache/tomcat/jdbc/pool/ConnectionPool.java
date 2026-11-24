@@ -1717,7 +1717,8 @@ public class ConnectionPool {
                 // that no session carries another identity, one the pool keeps
                 // rather than one it hopes for.
                 if (ignoredBorrowCredentialsWarned.compareAndSet(false, true)) {
-                    log.warn(MessageFactory.get("connectionPool.alternateUsernameIgnored", username));
+                    log.warn(MessageFactory.get("connectionPool.alternateUsernameIgnored",
+                            PoolUtilities.maskAndFlatten(username)));
                 }
                 username = null;
                 password = null;

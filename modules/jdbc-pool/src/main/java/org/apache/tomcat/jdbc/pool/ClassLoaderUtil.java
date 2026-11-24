@@ -68,7 +68,7 @@ public class ClassLoaderUtil {
     public static Class<?> loadClass(String className, ClassLoader... classLoaders) throws ClassNotFoundException {
         if (classLoaders == null || classLoaders.length == 0) {
             throw new ClassNotFoundException(
-                    MessageFactory.get("classLoaderUtil.classLoadersNone", className));
+                    MessageFactory.get("classLoaderUtil.classLoadersNone", PoolUtilities.maskAndFlatten(className)));
         }
         Throwable last = null;
         StringBuilder errorMsg = null;
@@ -76,7 +76,8 @@ public class ClassLoaderUtil {
             try {
                 if (cl != null) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Attempting to load class[" + className + "] from " + cl);
+                        log.debug("Attempting to load class[" + PoolUtilities.maskAndFlatten(className) +
+                                "] from " + PoolUtilities.maskAndFlatten(String.valueOf(cl)));
                     }
                     return Class.forName(className, true, cl);
                 } else {
@@ -91,14 +92,16 @@ public class ClassLoaderUtil {
                 ExceptionUtils.handleThrowable(x);
                 last = x;
                 errorMsg = appendFailure(errorMsg, cl, x);
-                log.warn(MessageFactory.get("classLoaderUtil.classLoadError", className, cl), x);
+                log.warn(MessageFactory.get("classLoaderUtil.classLoadError",
+                        PoolUtilities.maskAndFlatten(className), PoolUtilities.maskAndFlatten(String.valueOf(cl))),
+                        PoolUtilities.maskCredentials(x));
             }
             if (onlyAttemptFirstLoader) {
                 break;
             }
         }
-        throw new ClassNotFoundException(MessageFactory.get("classLoaderUtil.classLoadFailed", className, errorMsg),
-                last);
+        throw new ClassNotFoundException(MessageFactory.get("classLoaderUtil.classLoadFailed",
+                PoolUtilities.maskAndFlatten(className), errorMsg), last);
     }
 
     /**
@@ -118,9 +121,9 @@ public class ClassLoaderUtil {
             errorMsg.append(';');
         }
         errorMsg.append("ClassLoader:");
-        errorMsg.append(cl);
+        errorMsg.append(PoolUtilities.maskAndFlatten(String.valueOf(cl)));
         if (failure != null) {
-            errorMsg.append(" -> ").append(failure);
+            errorMsg.append(" -> ").append(PoolUtilities.maskAndFlatten(String.valueOf(failure)));
         }
         return errorMsg;
     }
