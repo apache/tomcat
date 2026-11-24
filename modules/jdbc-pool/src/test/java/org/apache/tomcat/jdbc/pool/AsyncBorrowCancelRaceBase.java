@@ -411,7 +411,7 @@ abstract class AsyncBorrowCancelRaceBase extends JdbcPoolBaseTest {
     }
 
     @Test
-    void concurrentGettersShareOneConnectionAndItIsReturnedOnce() throws Exception {
+    void concurrentGettersHandTheConnectionToOneCallerOnly() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setFairQueue(true);
         ds.getPoolProperties().setInitialSize(0);
@@ -449,14 +449,17 @@ abstract class AsyncBorrowCancelRaceBase extends JdbcPoolBaseTest {
         a.join(AWAIT_TIMEOUT_MS);
         b.join(AWAIT_TIMEOUT_MS);
 
-        Assertions.assertNull(failure.get(),
-                "both getters must be served, got " + failure.get());
-        Assertions.assertEquals(2, served.get());
+        Assertions.assertEquals(1, served.get(),
+                "exactly one caller may take the connection, served: " + served.get());
+        Assertions.assertInstanceOf(IllegalStateException.class, failure.get(),
+                "a later retrieval must be refused instead of handing the same handle to a "
+                        + "second caller, got " + failure.get());
+        Assertions.assertNotNull(handle.get(), "the one successful getter must have a handle");
         Assertions.assertEquals(1, ds.getActive(),
                 "one connection must be borrowed, not two");
         handle.get().close();
         Assertions.assertEquals(1, pool.getReturnedCount() - returnedBefore,
-                "the shared connection must be returned once");
+                "the connection must be returned once");
         Assertions.assertEquals(1, ds.getIdle());
         ds.close();
     }
