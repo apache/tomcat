@@ -241,6 +241,13 @@
         Expand the user name normalisation options available in the
         <code>LockOutRealm</code>. (markt)
       </fix>
+      <fix>
+        Harden the <code>RequestFilterValve</code>. If
+        <code>invalidAuthenticationWhenDeny</code> is configured and allows a
+        request through to be authenticated but the authenticator that processes
+        the request does not support preemptive authentication, then the request
+        is denied. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
