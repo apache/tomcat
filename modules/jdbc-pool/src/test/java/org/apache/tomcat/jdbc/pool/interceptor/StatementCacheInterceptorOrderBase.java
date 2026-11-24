@@ -24,8 +24,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.apache.tomcat.jdbc.JdbcPoolBaseTest;
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PooledConnection;
+import org.apache.tomcat.jdbc.pool.util.MessageFactory;
+import org.apache.tomcat.jdbc.test.support.LogCapture;
 
 /**
  * The documented order independence of the statement cache: a wrapping
@@ -253,5 +256,27 @@ abstract class StatementCacheInterceptorOrderBase extends JdbcPoolBaseTest {
         }
         Assertions.assertEquals(2, adminRowCount(racingTable),
                 "both executes of the racing SQL must have reached the database");
+    }
+
+    @Test
+    void aRuntimeInterceptorOrderChangeGetsTheStartDiagnostic() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
+        ds.getPoolProperties().setJdbcInterceptors(WRAPPER_CONFIG);
+        ds.createPool();
+        try {
+            try (LogCapture logs = new LogCapture("interceptor-order-canary",
+                    ConnectionPool.class, ConnectionPool.class)) {
+                logs.clear();
+                ds.setJdbcInterceptors(
+                        CACHE_CONFIG + ";" + QueryTimeoutInterceptor.class.getName());
+                Assertions.assertTrue(
+                        logs.hasMessage(MessageFactory.get("connectionPool.statementCacheBeforeQueryTimeout")),
+                        "a live interceptor order change must get the same warning the pool start gets");
+            }
+        } finally {
+            ds.close();
+        }
     }
 }
