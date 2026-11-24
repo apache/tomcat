@@ -52,6 +52,31 @@ abstract class DataSourceProxyPublicationCleanupBase extends JdbcPoolBaseTest {
     }
 
     @Test
+    void aPoolClosedDuringConstructionIsNotPublished() throws Exception {
+        PoolProperties properties = new PoolProperties();
+        properties.setUrl(getUrl());
+        properties.setDriverClassName("org.h2.Driver");
+        properties.setUsername("sa");
+        properties.setPassword("");
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(0);
+        properties.setMinIdle(0);
+        properties.setMaxActive(1);
+        properties.setMaxIdle(1);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        properties.setJdbcInterceptors(CloseDuringInitBase.ClosingOnStartInterceptor.class.getName());
+        DataSource ds = manage(new DataSource(properties));
+
+        SQLException thrown = Assertions.assertThrows(SQLException.class, ds::createPool,
+                "a pool closed during construction must fail creation instead of being published");
+        Assertions.assertTrue(thrown.getMessage().contains("closed during construction"),
+                "the failure must explain that the pool closed during creation, was: " + thrown.getMessage());
+        Assertions.assertEquals(0, ds.getPoolSize(),
+                "the data source must not hold a pool after the refused publication");
+        awaitSessions(0);
+    }
+
+    @Test
     void aFailureDuringPublicationClosesTheFreshPool() throws Exception {
         FailingPublicationProperties properties = new FailingPublicationProperties();
         properties.setUrl(getUrl());
