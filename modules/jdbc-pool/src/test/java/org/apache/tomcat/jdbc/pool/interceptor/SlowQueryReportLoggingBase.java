@@ -168,10 +168,7 @@ abstract class SlowQueryReportLoggingBase extends JdbcPoolBaseTest {
             // The JMX notification fired even before the fix; the log
             // channel must join it - one reported slow query, both
             // channels, whatever the store capacity is configured to.
-            Assertions.assertTrue(received.stream().anyMatch(n ->
-                            SlowQueryReportJmx.SLOW_QUERY_NOTIFICATION.equals(n.getType())
-                                    && n.getMessage() != null
-                                    && n.getMessage().contains("SELECT 2 FROM")),
+            Assertions.assertTrue(awaitNotificationMessage(received, "SELECT 2 FROM"),
                     "the slow query must notify through the name's broadcaster,"
                             + " received: " + received);
             logs.assertSlowQueryWarned("SELECT 2 FROM");

@@ -196,6 +196,7 @@ abstract class SlowQueryReportNamelessPoolBase extends JdbcPoolBaseTest {
                     }
                 }, "a slow query of a pool that carries no name must still come back as a"
                         + " executed statement");
+                awaitNotificationCount(received, 1);
                 Assertions.assertEquals(1, received.size(),
                         "the slow query must still be reported to the listeners the"
                                 + " interceptor has: the source of a notification may lose the"
