@@ -31,9 +31,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * replaced by a {@link RuntimeException} carrying it as the cause otherwise. An {@link Error} is always re-thrown as
  * it is, including one carried by an {@link InvocationTargetException}.
  * <p>
- * The pool prepends this interceptor to the definitions parsed from {@code jdbcInterceptors}, so it heads the chain
- * of every connection that has an interceptor chain at all; a pool configured without an interceptor list has no
- * chain and therefore no trap. An undeclared checked exception reaching such an untrapped connection still respects
+ * The pool prepends this interceptor to the definitions parsed from {@code jdbcInterceptors}, so it is the outermost
+ * configured interceptor of every connection that has an interceptor chain at all; the statement facade and the
+ * disposable connection facade are installed above it. A pool configured without an interceptor list has no chain and
+ * therefore no trap. An undeclared checked exception reaching such an untrapped connection still respects
  * the proxy contract - the JDK proxy itself turns it into an
  * {@link java.lang.reflect.UndeclaredThrowableException} - what the trap adds on top of that is the declared,
  * JDBC-shaped exception with the original preserved as its cause.

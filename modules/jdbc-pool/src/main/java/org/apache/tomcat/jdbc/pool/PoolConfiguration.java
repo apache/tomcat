@@ -337,10 +337,13 @@ public interface PoolConfiguration {
 
     /**
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
-     * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
-     * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
-     * value is the value of {@link #getMaxActive} when the configuration was created (100 with the default
-     * configuration); changing {@code maxActive} afterwards does not change {@code maxIdle}.
+     * false. If {@link #isPoolSweeperEnabled()} returns true, then returned connections are kept beyond this bound so
+     * the idle pool can grow up to {@link #getMaxActive}; nothing creates idle connections beyond the connections
+     * borrowers return, and the sweeper only trims idle connections according to
+     * {@link #getMinEvictableIdleTimeMillis()}. Default value is the value of {@link #getMaxActive} when the
+     * configuration was created (100 with the default configuration); changing {@code maxActive} afterwards does not
+     * change {@code maxIdle}. At pool start and on a live configuration apply, a negative or inconsistent
+     * {@code maxIdle} is repaired by the pool's configuration check, with a warning.
      *
      * @return the maximum number of idle connections.
      */
@@ -348,10 +351,13 @@ public interface PoolConfiguration {
 
     /**
      * The maximum number of connections that should be kept in the idle pool if {@link #isPoolSweeperEnabled()} returns
-     * false. If {@link #isPoolSweeperEnabled()} returns true, then the idle pool can grow up to
-     * {@link #getMaxActive} and will be shrunk according to {@link #getMinEvictableIdleTimeMillis()} setting. Default
-     * value is the value of {@link #getMaxActive} when the configuration was created (100 with the default
-     * configuration); changing {@code maxActive} afterwards does not change {@code maxIdle}.
+     * false. If {@link #isPoolSweeperEnabled()} returns true, then returned connections are kept beyond this bound so
+     * the idle pool can grow up to {@link #getMaxActive}; nothing creates idle connections beyond the connections
+     * borrowers return, and the sweeper only trims idle connections according to
+     * {@link #getMinEvictableIdleTimeMillis()}. Default value is the value of {@link #getMaxActive} when the
+     * configuration was created (100 with the default configuration); changing {@code maxActive} afterwards does not
+     * change {@code maxIdle}. At pool start and on a live configuration apply, a negative or inconsistent
+     * {@code maxIdle} is repaired by the pool's configuration check, with a warning.
      *
      * @param maxIdle the maximum size of the idle pool
      */
@@ -402,8 +408,11 @@ public interface PoolConfiguration {
      * not move it, so set this explicitly to change the floor (also see {@link #setTestWhileIdle(boolean)}). The
      * eviction run normally keeps the total number of connections in the pool - idle plus busy - at or above this
      * value, hence the number of actual connections can be between {@link #getMinIdle()} and somewhere between
-     * {@link #getMaxIdle()} and {@link #getMaxActive()}. A connection left over from an earlier pool generation is
-     * released regardless, so an explicit idle check after a purge can take the pool below the floor.
+     * {@link #getMaxIdle()} and {@link #getMaxActive()}. Connections are created by borrows, not to reach this floor:
+     * the value is an eviction floor, so a pool with no borrows holds no more connections than its initial pre-load. A
+     * connection left over from an earlier pool generation is released regardless, so an explicit idle check after a
+     * purge can take the pool below the floor. At pool start and on a live configuration apply, a negative or
+     * inconsistent {@code minIdle} is repaired by the pool's configuration check, with a warning.
      *
      * @return the minimum number of idle or established connections
      */
@@ -416,8 +425,11 @@ public interface PoolConfiguration {
      * not move it, so set this explicitly to change the floor (also see {@link #setTestWhileIdle(boolean)}). The
      * eviction run normally keeps the total number of connections in the pool - idle plus busy - at or above this
      * value, hence the number of actual connections can be between {@link #getMinIdle()} and somewhere between
-     * {@link #getMaxIdle()} and {@link #getMaxActive()}. A connection left over from an earlier pool generation is
-     * released regardless, so an explicit idle check after a purge can take the pool below the floor.
+     * {@link #getMaxIdle()} and {@link #getMaxActive()}. Connections are created by borrows, not to reach this floor:
+     * the value is an eviction floor, so a pool with no borrows holds no more connections than its initial pre-load. A
+     * connection left over from an earlier pool generation is released regardless, so an explicit idle check after a
+     * purge can take the pool below the floor. At pool start and on a live configuration apply, a negative or
+     * inconsistent {@code minIdle} is repaired by the pool's configuration check, with a warning.
      *
      * @param minIdle the minimum number of idle or established connections
      */
@@ -674,8 +686,9 @@ public interface PoolConfiguration {
      * The SQL query that will be used to validate connections from this pool before returning them to the caller or
      * pool. If specified, this query does not have to return any data, it just can't throw an SQLException. The default
      * value is null. A blank query is stored as the unset value: a configuration surface that cannot express null is
-     * written empty to mean "no statement", and no statement can be blank. Example values are SELECT 1(mysql), select
-     * 1 from dual(oracle), SELECT 1(MS Sql Server)
+     * written empty to mean "no statement", and no statement can be blank. A blank value therefore reads back as
+     * {@code null} from {@link #getValidationQuery()}. Example values are SELECT 1(mysql), select 1 from
+     * dual(oracle), SELECT 1(MS Sql Server)
      *
      * @param validationQuery the query used for validation, or null or a blank string if no validation query is set
      */
@@ -1044,7 +1057,9 @@ public interface PoolConfiguration {
      * Set to true if you want the connection pool to commit any pending transaction when a connection is returned. The
      * default value is false, as this could result in committing data. This parameter is ignored if
      * {@link #setRollbackOnReturn(boolean)} is also set to true. The commit is only performed when the returned
-     * connection is actually in a transaction.
+     * connection is actually in a transaction. A transaction is inferred from
+     * {@link java.sql.Connection#getAutoCommit()} returning false: a transaction a driver or raw SQL leaves open
+     * while auto-commit is true is outside this handling.
      *
      * @param commitOnReturn set to true if the pool should call {@link java.sql.Connection#commit()} when a connection
      *                           is returned to the pool. Default is false
@@ -1062,7 +1077,9 @@ public interface PoolConfiguration {
     /**
      * Set to true if you want the connection pool to rollback any pending transaction when a connection is returned.
      * The default value is false, as this could result in discarding data the application has not committed. The
-     * rollback is only performed when the returned connection is actually in a transaction.
+     * rollback is only performed when the returned connection is actually in a transaction, inferred from
+     * {@link java.sql.Connection#getAutoCommit()} returning false; a transaction a driver or raw SQL leaves open while
+     * auto-commit is true is outside this handling.
      *
      * @param rollbackOnReturn set to true if the pool should call {@link java.sql.Connection#rollback()} when a
      *                             connection is returned to the pool. Default is false
