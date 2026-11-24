@@ -2299,6 +2299,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             log("Copy: " + source + " To: " + dest + " Infinite: " + infiniteCopy);
         }
 
+        // Silently skip copying the special directories if access has been disabled.
+        if (isSpecialPath(source)) {
+            return true;
+        }
+
         WebResource sourceResource = resources.getResource(source);
 
         if (sourceResource.isDirectory()) {
