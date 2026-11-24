@@ -1549,18 +1549,23 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
         }
         StringBuilder result = new StringBuilder(value.length());
         int segmentStart = 0;
-        while (segmentStart < value.length()) {
-            int segmentEnd = value.indexOf(';', segmentStart);
-            if (segmentEnd < 0) {
-                segmentEnd = value.length();
-            }
-            maskInterceptorSegment(value, segmentStart, segmentEnd, result);
-            if (segmentEnd < value.length()) {
-                // Keep the definition separator itself.
+        int depth = 0;
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '(') {
+                depth++;
+            } else if (c == ')' && depth > 0) {
+                depth--;
+            } else if (c == ';' && depth == 0) {
+                // A separator only ends a definition outside every property
+                // list: a semicolon inside a value (a credential among them)
+                // is part of that value, not a new definition.
+                maskInterceptorSegment(value, segmentStart, i, result);
                 result.append(';');
+                segmentStart = i + 1;
             }
-            segmentStart = segmentEnd + 1;
         }
+        maskInterceptorSegment(value, segmentStart, value.length(), result);
         return result.toString();
     }
 

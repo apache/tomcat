@@ -1219,6 +1219,21 @@ abstract class PoolPropertiesBase {
     }
 
     @Test
+    void toStringMasksAnInterceptorCredentialContainingADefinitionSeparator() {
+        PoolProperties properties = new PoolProperties();
+        properties.setJdbcInterceptors("StatementCache(password=ab;cd,prepared=true)");
+
+        String asString = properties.toString();
+
+        Assertions.assertFalse(asString.contains("ab;cd"),
+                "a semicolon inside a credential value must not end the definition and leak the tail, was: "
+                        + asString);
+        Assertions.assertTrue(asString.contains(
+                        "StatementCache(password=********,prepared=true)"),
+                "the class, the rest of the value and the following pair must stay readable, was: " + asString);
+    }
+
+    @Test
     void toStringMasksAnInterceptorCredentialInANestedPropertyList() {
         PoolProperties properties = new PoolProperties();
         properties.setJdbcInterceptors(
