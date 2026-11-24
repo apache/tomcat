@@ -162,6 +162,10 @@ abstract class JmxMonitorBase extends JdbcPoolBaseTest {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJmxEnabled(true);
         ds.getPoolProperties().setMaxActive(2);
+        // Keep the background sweeper out of the way: this test drives the
+        // idle validation itself, and a concurrent sweep would race its own
+        // iteration over the idle queue.
+        ds.getPoolProperties().setTimeBetweenEvictionRunsMillis(-1);
         // two connections the pool pre-creates at startup, so the test has
         // physical connections it does not have to borrow
         ds.getPoolProperties().setInitialSize(2);
@@ -268,6 +272,10 @@ abstract class JmxMonitorBase extends JdbcPoolBaseTest {
         props.setInitialSize(0);
         props.setMinIdle(0);
         ds.createPool();
+        // The live view is the supported post-start configuration surface.
+        // Direct mutation of the builder captured before the pool started is
+        // no longer visible to the pool.
+        props = ds.getPoolProperties();
         try {
             ConnectionPool mbean = new ConnectionPool(ds.getPool());
 
