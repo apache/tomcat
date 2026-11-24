@@ -197,6 +197,12 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
     @Override
     public void setProperties(Map<String, PoolProperties.InterceptorProperty> properties) {
         super.setProperties(properties);
+        for (Map.Entry<String, PoolProperties.InterceptorProperty> entry : properties.entrySet()) {
+            if (!isKnownProperty(entry.getKey())) {
+                log.warn(MessageFactory.get("statementFinalizer.unknownProperty", entry.getKey(),
+                        entry.getValue().getValue()));
+            }
+        }
 
         PoolProperties.InterceptorProperty logProperty = properties.get("trace");
         if (null != logProperty) {
@@ -207,6 +213,18 @@ public class StatementFinalizer extends AbstractCreateStatementInterceptor {
             }
             logCreationStack = logProperty.getValueAsBoolean(logCreationStack);
         }
+    }
+
+    /**
+     * Whether this interceptor configuration reads the named property. {@code trace} is this class's own;
+     * {@code useEquals} belongs to the base class.
+     *
+     * @param name the property name to test
+     *
+     * @return {@code true} if the name configures this interceptor
+     */
+    protected boolean isKnownProperty(String name) {
+        return "trace".equals(name) || "useEquals".equals(name);
     }
 
     @Override
