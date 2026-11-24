@@ -35,6 +35,53 @@ import org.apache.tomcat.jdbc.pool.AsyncBorrowCancelRaceBase.ParkingValidator;
 abstract class AsyncBorrowInterruptBase extends JdbcPoolBaseTest {
 
     @Test
+    void interruptingTheWaitDeregistersTheAsyncWaiter() throws Exception {
+        DataSource ds = newDataSource();
+        ds.getPoolProperties().setFairQueue(true);
+        ds.getPoolProperties().setInitialSize(0);
+        ds.getPoolProperties().setMinIdle(0);
+        ds.getPoolProperties().setMaxActive(1);
+        ds.getPoolProperties().setMaxIdle(1);
+        ds.getPoolProperties().setMaxWait(5000);
+        ds.createPool();
+
+        Connection holder = ds.getConnection();
+        setSessionMarker(holder, 12);
+        Future<Connection> future = ds.getConnectionAsync();
+        Assertions.assertFalse(future.isDone(), "the poll must wait for the held connection");
+
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread caller = new Thread(() -> {
+            try {
+                future.get(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            } catch (Throwable x) {
+                failure.set(x);
+            }
+        }, "interrupted-async-waiter");
+        caller.setDaemon(true);
+        caller.start();
+        awaitUntil(() -> caller.getState() == Thread.State.WAITING
+                || caller.getState() == Thread.State.TIMED_WAITING);
+
+        caller.interrupt();
+        caller.join(AWAIT_TIMEOUT_MS);
+        Assertions.assertFalse(caller.isAlive(), "the interrupted get() must return");
+        Assertions.assertTrue(failure.get() instanceof InterruptedException,
+                "the timed get() must report InterruptedException, got " + failure.get());
+        Assertions.assertTrue(future.isDone(),
+                "an interrupted queue wait must complete the future, not leave it waiting");
+
+        holder.close();
+        try (Connection next = ds.getConnection()) {
+            Assertions.assertEquals(Integer.valueOf(12), sessionMarker(next),
+                    "the returned connection must go to the next borrower, not to the interrupted waiter");
+        }
+        Assertions.assertEquals(1, poolSessions(), "the pool must keep its single physical session");
+        Assertions.assertEquals(1, ds.getIdle());
+        ds.close();
+    }
+
+    @Test
     void interruptingTheTimedGetDuringSetupReturnsTheProducedConnection() throws Exception {
         ParkingValidator validator = new ParkingValidator();
         DataSource ds = newDataSource();
