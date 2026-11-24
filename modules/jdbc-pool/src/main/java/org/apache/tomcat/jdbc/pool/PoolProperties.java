@@ -2027,13 +2027,14 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
 
         /**
          * Returns the interceptor class, loading it if necessary. The configured class must extend
-         * {@link JdbcInterceptor}: a class that loads but does not extend it fails the pool start with a
-         * {@link ClassCastException} when this method returns.
+         * {@link JdbcInterceptor}. The cast to {@code Class<? extends JdbcInterceptor>} is erased, so a class that
+         * loads but does not extend {@link JdbcInterceptor} is returned from this method unchanged; the check is made
+         * later, when the pool instantiates it and assigns the new object to a {@link JdbcInterceptor}, and is
+         * reported as an interceptor-instantiation failure rather than as a {@link ClassCastException} here.
          *
-         * @return the interceptor class
+         * @return the loaded class, nominally an interceptor class
          *
          * @throws ClassNotFoundException if the class cannot be found
-         * @throws ClassCastException if the class does not extend {@link JdbcInterceptor}
          */
         @SuppressWarnings("unchecked")
         public Class<? extends JdbcInterceptor> getInterceptorClass() throws ClassNotFoundException {
