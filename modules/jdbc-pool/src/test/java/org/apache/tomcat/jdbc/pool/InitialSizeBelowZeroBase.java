@@ -93,6 +93,71 @@ abstract class InitialSizeBelowZeroBase extends JdbcPoolBaseTest {
         }
     }
 
+    /**
+     * Stores a huge positive pre-load count after the construction check has
+     * read the value it compares against maxActive, so the store is past the
+     * correction that would otherwise bring it down. The allocation itself
+     * must still bound the count to maxActive instead of allocating the huge
+     * array.
+     */
+    private static final class HookedLargeInitialSizeProperties extends PoolProperties {
+
+        private static final long serialVersionUID = 1L;
+
+        private int constructionReads;
+
+        @Override
+        public int getInitialSize() {
+            if (fromConstructionCheck()) {
+                constructionReads++;
+                if (constructionReads == 4) {
+                    int before = super.getInitialSize();
+                    super.setInitialSize(Integer.MAX_VALUE);
+                    return before;
+                }
+            }
+            return super.getInitialSize();
+        }
+
+        private boolean fromConstructionCheck() {
+            StackTraceElement[] frames = new Throwable().getStackTrace();
+            for (int i = 1; i < frames.length - 1; i++) {
+                if ("checkPoolConfiguration".equals(frames[i].getMethodName())
+                        && "init".equals(frames[i + 1].getMethodName())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    @Test
+    void aHugeInitialSizeStoredAfterTheConstructionCheckIsBoundedAtAllocation() throws Exception {
+        DataSource ds = new DataSource();
+        HookedLargeInitialSizeProperties properties = new HookedLargeInitialSizeProperties();
+        properties.setUrl(getUrl());
+        properties.setDriverClassName("org.h2.Driver");
+        properties.setUsername("sa");
+        properties.setPassword("");
+        properties.setJmxEnabled(false);
+        properties.setInitialSize(1);
+        properties.setMaxActive(4);
+        properties.setMinIdle(0);
+        properties.setMaxIdle(4);
+        properties.setTimeBetweenEvictionRunsMillis(-1);
+        ds.setPoolProperties(properties);
+        manage(ds);
+
+        ds.createPool();
+
+        Assertions.assertNotNull(ds.getPool(), "the pool must be created despite the huge raced-in count");
+        Assertions.assertEquals(4, ds.getPoolSize(),
+                "the pre-load must be bounded by maxActive rather than by the raced-in initialSize");
+        try (Connection pooled = ds.getConnection()) {
+            Assertions.assertTrue(pooled.isValid(1), "a pool created after the bounded pre-load still works");
+        }
+    }
+
     /*
      * A pool asked to pre-load a negative number of connections: the count is
      * corrected, the pool starts, and the interceptors that were told it started
