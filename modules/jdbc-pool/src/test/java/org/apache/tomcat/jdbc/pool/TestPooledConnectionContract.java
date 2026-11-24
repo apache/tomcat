@@ -42,4 +42,8 @@ class TestPooledConnectionContract {
     class PooledConnectionHandleLeak extends PooledConnectionHandleLeakBase {
     }
 
+    @Nested
+    class PooledConnectionConfigurationReads extends PooledConnectionConfigurationReadsBase {
+    }
+
 }
