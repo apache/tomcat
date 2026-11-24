@@ -17,6 +17,7 @@
 package org.apache.tomcat.jdbc.pool;
 
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Assertions;
@@ -60,6 +61,25 @@ abstract class PooledConnectionConfigurationReadsBase extends JdbcPoolBaseTest {
         Field field = PooledConnection.class.getDeclaredField("lastConnected");
         field.setAccessible(true);
         field.setLong(connection, value);
+    }
+
+    @Test
+    void aTerminalReleaseRemovesTheCachedCredentials() throws Exception {
+        DataSource ds = newDataSource();
+        ds.createPool();
+        Connection held = ds.getConnection();
+        PooledConnection pooled = internalOf(held);
+        Assertions.assertEquals("sa", pooled.getAttributes().get(PooledConnection.PROP_USER),
+                "precondition: the connected session caches its user name for renewal");
+        Assertions.assertEquals("", pooled.getAttributes().get(PooledConnection.PROP_PASSWORD),
+                "precondition: the connected session caches its password for renewal");
+
+        ds.close(true);
+
+        Assertions.assertFalse(pooled.getAttributes().containsKey(PooledConnection.PROP_USER),
+                "a terminal release must not leave the cached user name behind");
+        Assertions.assertFalse(pooled.getAttributes().containsKey(PooledConnection.PROP_PASSWORD),
+                "a terminal release must not leave the cached password behind");
     }
 
     @Test

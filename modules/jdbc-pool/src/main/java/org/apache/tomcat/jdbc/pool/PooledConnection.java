@@ -20,7 +20,9 @@ package org.apache.tomcat.jdbc.pool;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -136,7 +138,12 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     protected ConnectionPool parent;
 
-    private HashMap<Object, Object> attributes = new HashMap<>();
+    /**
+     * The per-connection attribute map shared with the interceptor chain. Synchronized, because a late statement-cache
+     * call from an ended borrow can read it while a reconnect stages credentials or the connect path writes a
+     * statement-cache binding; it must also accept a null credential value.
+     */
+    private final Map<Object, Object> attributes = Collections.synchronizedMap(new HashMap<>());
 
     private volatile long connectionVersion = 0;
 
@@ -872,7 +879,7 @@ public class PooledConnection implements PooledConnectionMBean {
         long servedLastConnected;
         long servedLastValidated;
         boolean servedDiscarded;
-        HashMap<Object, Object> sessionAttributes = getAttributes();
+        Map<Object, Object> sessionAttributes = getAttributes();
         boolean hadUser;
         Object servedUser;
         boolean hadPassword;
@@ -1143,6 +1150,14 @@ public class PooledConnection implements PooledConnectionMBean {
             // Close any handle too: an XA/CPDS handle owns the physical
             // session even when obtaining its logical connection failed.
             closeSession(session, xa, cpds);
+        }
+        if (finalize) {
+            // The terminal release ends the connection's ability to renew
+            // itself, so the cached credentials have no further use and must
+            // not stay in the attribute map of an object other code may still
+            // hold.
+            attributes.remove(PROP_USER);
+            attributes.remove(PROP_PASSWORD);
         }
         // The chain's teardown reset is delivered once, by the release that
         // clears the handler after it has freed the pool slot - see
@@ -1576,7 +1591,11 @@ public class PooledConnection implements PooledConnectionMBean {
             transactionDirty = false;
             return true;
         } catch (SQLException e) {
-            log.debug("Failed to commit transaction", PoolUtilities.maskCredentials(e));
+            if (configuration().getLogValidationErrors()) {
+                log.error(MessageFactory.get("pooledConnection.commitFailed"), PoolUtilities.maskCredentials(e));
+            } else if (log.isDebugEnabled()) {
+                log.debug("Failed to commit transaction", PoolUtilities.maskCredentials(e));
+            }
         } catch (Throwable e) {
             // A non-fatal Error is the same failed commit an unchecked
             // exception is: it must not escape through the caller's finally
@@ -1605,7 +1624,11 @@ public class PooledConnection implements PooledConnectionMBean {
             transactionDirty = false;
             return true;
         } catch (SQLException e) {
-            log.debug("Failed to rollback transaction", PoolUtilities.maskCredentials(e));
+            if (configuration().getLogValidationErrors()) {
+                log.error(MessageFactory.get("pooledConnection.rollbackFailed"), PoolUtilities.maskCredentials(e));
+            } else if (log.isDebugEnabled()) {
+                log.debug("Failed to rollback transaction", PoolUtilities.maskCredentials(e));
+            }
         } catch (Throwable e) {
             // A non-fatal Error is handled exactly like the unchecked
             // failure below.
@@ -2079,14 +2102,17 @@ public class PooledConnection implements PooledConnectionMBean {
      * Returns the attributes map for this connection.
      * <p>
      * This is the live internal map, not a copy: the pool and the interceptor chain read and write it while the
-     * session runs. It also holds the plaintext credential entries the connect path mirrors there, so it is intended
-     * for internal and trusted interceptor code; application code that obtains a {@link PooledConnection} through the
-     * delegate or reflection must not treat this as a public, credential-free view. The wrapper contract refuses the
-     * internal pooled connection; this accessor is the one internal surface that still exposes it.
+     * session runs. It is a synchronized map, so a late statement-cache call from an ended borrow can read it while a
+     * reconnect stages credentials on the same connection. It holds the plaintext credential entries the connect path
+     * mirrors there while the connection is in service - they are removed when the session is terminally released -
+     * so it is intended for internal and trusted interceptor code; application code that obtains a
+     * {@link PooledConnection} through the delegate or reflection must not treat this as a public, credential-free
+     * view. The wrapper contract refuses the internal pooled connection; this accessor is the one internal surface
+     * that still exposes it.
      *
      * @return the live attributes map for this connection
      */
-    public HashMap<Object, Object> getAttributes() {
+    public Map<Object, Object> getAttributes() {
         return attributes;
     }
 
