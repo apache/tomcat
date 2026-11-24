@@ -43,12 +43,10 @@ import org.apache.tomcat.jdbc.pool.util.MessageFactory;
  * cached statement executes with no timeout. Listed before the cache, the hook runs for every creation request,
  * including the ones the cache serves, and the timeout is re-applied to the reused statement.
  * <p>
- * The same applies to statements whose connection never enters the chain: one reached through
- * {@link javax.sql.PooledConnection#getConnection()} or {@code unwrap}, and, on a pool backed by an
- * {@link javax.sql.XADataSource}, the only connection an application uses - such an application gets its connection
- * from {@link javax.sql.XAConnection#getConnection()}, which the pool answers with the session behind the chain.
- * Those statements keep whatever timeout the driver gives them; for the XA case the pool warns at startup, see
- * {@link #poolStarted(ConnectionPool)}.
+ * A connection obtained through {@link javax.sql.PooledConnection#getConnection()} or
+ * {@link javax.sql.XAConnection#getConnection()} is the pooled handle itself, so its statements pass through this
+ * interceptor too. Only a connection reached through {@code unwrap} leaves the chain: the driver's own object is the
+ * documented escape, and statements created on it keep whatever timeout the driver gives them.
  * <p>
  * Whether a configured timeout actually interrupts a query is up to the driver. A driver that refuses
  * {@link Statement#setQueryTimeout(int)} does not stop the statement from being handed out - the pool cannot enforce a
@@ -131,40 +129,6 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
         } catch (NumberFormatException x) {
             log.warn(MessageFactory.get("queryTimeoutInterceptor.invalidQueryTimeout",
                     p.getValue(), Integer.valueOf(timeout)));
-        }
-    }
-
-    /**
-     * Ends the silence about the one configuration in which this interceptor is
-     * inert for an application's normal use: a pool backed by a
-     * {@link javax.sql.XADataSource}, where the application's only
-     * {@link java.sql.Connection} comes from
-     * {@link javax.sql.XAConnection#getConnection()} and so stays outside this
-     * chain (see the class javadoc and the {@code getConnection()} branch of
-     * {@link org.apache.tomcat.jdbc.pool.ProxyConnection}). The interceptor
-     * cannot reach the statements created there - that would mean re-wrapping the
-     * session the pool hands out, which is a pool-level change, not an
-     * interceptor's - and refusing to start the pool would deny an application a
-     * timeout its driver may still apply at its own creation call, so what is
-     * done instead is one warning at pool start, while the configuration is
-     * still the operator's to change. Statements taken through the pool's own
-     * chained handle keep the configured timeout even on an XA-backed pool, so
-     * the warning names the one route the escape runs by, not the pool as a
-     * whole.
-     *
-     * @param pool the pool that is starting
-     */
-    @Override
-    public void poolStarted(ConnectionPool pool) {
-        super.poolStarted(pool);
-        // The configured timeout is already applied: the pool configures the
-        // properties of a definition instance before it lets that instance know
-        // about the pool start. A timeout of zero or less switches the feature
-        // off, and there is then no configured protection whose absence the
-        // warning could report.
-        if (pool != null && timeout > 0
-                && pool.getPoolProperties().getDataSource() instanceof javax.sql.XADataSource) {
-            log.warn(MessageFactory.get("queryTimeoutInterceptor.xaBypass", Integer.valueOf(timeout)));
         }
     }
 

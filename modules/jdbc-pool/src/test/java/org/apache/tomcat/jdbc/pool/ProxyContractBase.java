@@ -141,16 +141,16 @@ abstract class ProxyContractBase extends JdbcPoolBaseTest {
 
     /*
      * The javax.sql.PooledConnection accessor on the handle answers the
-     * borrow, not the pooled connection: a handle that reports itself
-     * closed must refuse it rather than reveal the session below. The
-     * state pinned here is the reachable one - an interceptor marked the
-     * session discarded while this borrower still holds the handle, so
-     * the physical session stays open until the late return retires it -
-     * and the handle's own closed answer is pinned by the same probe the
-     * validity tests use.
+     * borrow's logical connection - the pooled handle itself: a handle that
+     * reports itself closed must refuse it rather than hand out a lease the
+     * pool has committed to retire. The state pinned here is the reachable
+     * one - an interceptor marked the session discarded while this borrower
+     * still holds the handle, so the physical session stays open until the
+     * late return retires it - and the handle's own closed answer is pinned
+     * by the same probe the validity tests use.
      */
     @Test
-    void aDiscardedHandleRefusesToHandOutItsSession() throws Exception {
+    void aDiscardedHandleRefusesToHandOutItsLogicalConnection() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(
                 DiscardMarkingInterceptor.class.getName());
@@ -158,10 +158,11 @@ abstract class ProxyContractBase extends JdbcPoolBaseTest {
 
         Connection held = ds.getConnection();
         // While the borrow is live the accessor answers, as it must: the
-        // caller that needs the session behind a live handle still gets it.
-        Connection physical = ((PooledConnection) held).getConnection();
-        Assertions.assertNotNull(physical,
-                "precondition: a live handle must hand out the physical session");
+        // caller that needs the logical connection behind a live handle
+        // gets the pooled handle itself.
+        Connection logical = ((PooledConnection) held).getConnection();
+        Assertions.assertSame(held, logical,
+                "precondition: a live handle must hand out its logical connection");
 
         // The marking probe leaves the borrower holding a handle whose
         // session the pool has committed to retiring.
@@ -230,21 +231,27 @@ abstract class ProxyContractBase extends JdbcPoolBaseTest {
     }
 
     @Test
-    void thePhysicalSessionStaysReachableThroughThePooledConnectionInterface()
-            throws Exception {
+    void thePooledConnectionInterfaceAnswersTheLogicalHandle() throws Exception {
         DataSource ds = newDataSource();
         ds.createPool();
 
         try (Connection pooled = ds.getConnection()) {
             Assertions.assertInstanceOf(PooledConnection.class, pooled,
                     "the facade must also expose the pooled connection interface");
-            Connection physical = ((PooledConnection) pooled).getConnection();
-            Assertions.assertNotNull(physical, "the underlying session must be reachable");
+            Connection logical = ((PooledConnection) pooled).getConnection();
+            Assertions.assertSame(pooled, logical,
+                    "the accessor must answer the pooled logical handle, not the raw driver session");
+            Assertions.assertEquals(getUrl(), logical.getMetaData().getURL(),
+                    "the logical handle must work and be the connection the pool opened");
+
+            // The raw driver session stays reachable through the documented
+            // Wrapper escape, not through the PooledConnection accessor.
+            Connection physical = pooled.unwrap(Connection.class);
             Assertions.assertTrue(physical.getClass().getName().startsWith("org.h2."),
-                    "the underlying session must be the driver's own object, was "
+                    "unwrap() must still hand out the driver's own object, was "
                             + physical.getClass().getName());
             Assertions.assertEquals(getUrl(), physical.getMetaData().getURL(),
-                    "the reachable session must be the one the pool opened");
+                    "the unwrapped session must be the one the pool opened");
 
             Assertions.assertTrue(pooled.isWrapperFor(Connection.class));
             Assertions.assertFalse(pooled.isWrapperFor(javax.sql.XAConnection.class),

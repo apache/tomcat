@@ -449,10 +449,9 @@ public class DataSourceProxy implements PoolConfiguration {
      * free session or fails with pool exhaustion rather than with a database error. Its
      * {@link java.sql.Connection#close() close()} returns the session to the pool instead of closing the physical
      * connection. The connection obtained from the returned handle's
-     * {@link javax.sql.PooledConnection#getConnection()} is the driver's raw logical session, not a pool-managed
-     * connection: the pool's interceptors and features do not apply to it, and closing it invalidates the session
-     * under the pool's own notion of a live connection. Release the borrowed session by closing the handle, not that
-     * connection.
+     * {@link javax.sql.PooledConnection#getConnection()} is the pooled handle itself: closing it returns the session to
+     * the pool, exactly as closing the handle does, and its statements pass through the pool's interceptor chain. The
+     * raw provider session is never exposed through that accessor.
      *
      * @return the borrowed pooled-connection handle
      *

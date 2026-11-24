@@ -56,9 +56,14 @@ abstract class ValidationBase extends JdbcPoolBaseTest {
         return ds;
     }
 
-    /** The physical connection behind a pooled one, for fault injection. */
+    /**
+     * The driver's own connection behind a pooled one, for fault injection.
+     * The javax.sql.PooledConnection accessor answers the pooled logical
+     * handle itself, so the raw session is reached through the documented
+     * {@code unwrap} escape.
+     */
     private static Connection physical(Connection pooled) throws SQLException {
-        return ((javax.sql.PooledConnection) pooled).getConnection();
+        return pooled.unwrap(Connection.class);
     }
 
     @Test

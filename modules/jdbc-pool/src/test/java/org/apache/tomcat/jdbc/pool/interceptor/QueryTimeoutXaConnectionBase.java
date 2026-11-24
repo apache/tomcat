@@ -19,8 +19,6 @@ package org.apache.tomcat.jdbc.pool.interceptor;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.stream.Collectors;
 
@@ -35,22 +33,17 @@ import org.apache.tomcat.jdbc.pool.XADataSource;
 import org.apache.tomcat.jdbc.test.support.LogCapture;
 
 /**
- * On a pool backed by a {@link javax.sql.XADataSource} the applications'
- * statements are created on the session that
- * {@link javax.sql.XAConnection#getConnection()} hands out, which is the
- * physical session from behind the interceptor chain - so the query timeout
- * this interceptor configures never reaches them. That is a property of the
- * pool's dispatch, not something this class can change, but the interceptor
- * must not then go about its silence: an operator who configured the timeout
- * as a protection has to hear, at pool start, that the pool they configured is
- * one this interceptor cannot serve. And the warning must stay honest - it is
- * due on an XA pool with a configured timeout and on no other pool, and not
- * even on an XA pool whose timeout is switched off.
+ * On a pool backed by a {@link javax.sql.XADataSource}, an application's
+ * connection normally comes from {@link javax.sql.XAConnection#getConnection()}.
+ * The pool answers that call with the pooled handle itself, so statements
+ * created through it pass the interceptor chain and carry the configured
+ * query timeout. There is no bypass to warn about, and the interceptor must
+ * stay silent about one that does not exist.
  */
-abstract class QueryTimeoutXaBypassWarningBase extends JdbcPoolBaseTest {
+abstract class QueryTimeoutXaConnectionBase extends JdbcPoolBaseTest {
 
-    /** Substring identifying the bypass warning among the captured records. */
-    private static final String BYPASS_WARNING = "will not reach the statements applications create";
+    /** Substring of the warning the old raw-session dispatch used to log. */
+    private static final String OLD_BYPASS_WARNING = "will not reach the statements applications create";
 
     /*
      * An XA-backed pool with this interceptor configured the way an operator
@@ -74,34 +67,31 @@ abstract class QueryTimeoutXaBypassWarningBase extends JdbcPoolBaseTest {
     }
 
     /**
-     * The warning is about a hole that is really there: prove it end to end on
-     * the same pool - a statement created through the XA handle's
-     * {@code getConnection()} keeps the driver's own timeout while a statement
-     * created on a chained borrow gets the configured one - before asserting
-     * that the interceptor says so at start.
+     * The XA handle's {@code getConnection()} must answer the pooled handle
+     * itself, so a statement created through it passes the chain and carries
+     * the configured timeout. The interceptor must not warn about the bypass
+     * the raw-session dispatch used to create.
      */
     @Test
-    void anXaPoolHearsOneBypassWarningAtStartNamingWhatItCovers() throws Exception {
+    void anXaPoolAppliesTheTimeoutToTheLogicalConnectionItHandsOut() throws Exception {
         XADataSource ds = xaPool("(queryTimeout=5)");
-        try (BypassLogCapture logs = new BypassLogCapture()) {
+        try (XaLogCapture logs = new XaLogCapture()) {
             ds.createPool();
-            logs.assertBypassWarnings(1, "an XA pool must be told once at start");
+            logs.assertNoBypassWarning("an XA pool hands out the pooled handle, so there is no bypass to warn about");
 
-            // The hole the warning names: statements from the XA handle's
-            // logical session never pass through the interceptor.
             XAConnection xc = ds.getXAConnection();
             try {
                 Connection logical = xc.getConnection();
+                Assertions.assertSame(xc, logical,
+                        "getConnection() must answer the pooled handle itself, not the raw driver session");
                 try (Statement st = logical.createStatement()) {
-                    Assertions.assertEquals(0, st.getQueryTimeout(),
-                            "a statement created through XAConnection.getConnection() must be untouched by the interceptor");
+                    Assertions.assertEquals(5, st.getQueryTimeout(),
+                            "a statement created through XAConnection.getConnection() must carry the configured timeout");
                 }
             } finally {
                 xc.close();
             }
 
-            // And the warning must not be talk about a hole this pool does
-            // not have: a statement created on the chained borrow is timed.
             try (Connection pooled = ds.getConnection();
                     Statement st = pooled.createStatement()) {
                 Assertions.assertEquals(5, st.getQueryTimeout(),
@@ -116,18 +106,18 @@ abstract class QueryTimeoutXaBypassWarningBase extends JdbcPoolBaseTest {
      * must stay quiet about a bypass that does not exist.
      */
     @Test
-    void aPlainPoolHearsNoBypassWarning() throws Exception {
+    void aPlainPoolReportsNoBypassWarning() throws Exception {
         DataSource ds = newDataSource();
         ds.getPoolProperties().setJdbcInterceptors(
                 QueryTimeoutInterceptor.class.getName() + "(queryTimeout=5)");
-        try (BypassLogCapture logs = new BypassLogCapture()) {
+        try (XaLogCapture logs = new XaLogCapture()) {
             ds.createPool();
             try (Connection pooled = ds.getConnection();
                     Statement st = pooled.createStatement()) {
                 Assertions.assertEquals(5, st.getQueryTimeout(),
                         "the chained path must still apply the timeout the silence of this test is about");
             }
-            logs.assertBypassWarnings(0, "a pool that serves its statements through the chain has no bypass to report");
+            logs.assertNoBypassWarning("a pool that serves its statements through the chain has no bypass to report");
         }
     }
 
@@ -137,11 +127,11 @@ abstract class QueryTimeoutXaBypassWarningBase extends JdbcPoolBaseTest {
      * nobody configured. The silence here is the honest one.
      */
     @Test
-    void anXaPoolWithoutAConfiguredTimeoutHearsNoBypassWarning() throws Exception {
+    void anXaPoolWithoutAConfiguredTimeoutReportsNoBypassWarning() throws Exception {
         XADataSource ds = xaPool("(queryTimeout=0)");
-        try (BypassLogCapture logs = new BypassLogCapture()) {
+        try (XaLogCapture logs = new XaLogCapture()) {
             ds.createPool();
-            logs.assertBypassWarnings(0,
+            logs.assertNoBypassWarning(
                     "a switched-off interceptor has no protection to report as bypassed");
         }
     }
@@ -153,38 +143,28 @@ abstract class QueryTimeoutXaBypassWarningBase extends JdbcPoolBaseTest {
      * JUL directly - proves the wiring observes those records before the pool
      * under test gets its chance to log.
      */
-    private static final class BypassLogCapture extends LogCapture {
-        BypassLogCapture() {
-            super("query-timeout-xa-bypass-handler-wiring-canary", QueryTimeoutInterceptor.class, QueryTimeoutInterceptor.class);
+    private static final class XaLogCapture extends LogCapture {
+        XaLogCapture() {
+            super("query-timeout-xa-handler-wiring-canary", QueryTimeoutInterceptor.class, QueryTimeoutInterceptor.class);
         }
 
 
 
 
         /*
-         * The bypass warnings seen so far, with the volume pinned: an empty
-         * list fails the no-warning tests as silently as a chatty one fails the
-         * warning test, so both directions assert here.
+         * No record may carry the old bypass warning: the raw-session dispatch
+         * that made it true is gone, so reporting it would be a false alarm.
          */
-        void assertBypassWarnings(int expected, String why) {
-            List<LogRecord> seen;
+        void assertNoBypassWarning(String why) {
+            ArrayList<LogRecord> seen;
             synchronized (records) {
                 seen = new ArrayList<>(records);
             }
-            List<LogRecord> warnings = seen.stream()
-                    .filter(r -> r.getMessage() != null && r.getMessage().contains(BYPASS_WARNING))
-                    .collect(Collectors.toList());
-            Assertions.assertEquals(expected, warnings.size(),
+            Assertions.assertTrue(
+                    seen.stream().noneMatch(r -> r.getMessage() != null
+                            && r.getMessage().contains(OLD_BYPASS_WARNING)),
                     why + ", messages seen: " + seen.stream().map(LogRecord::getMessage)
                             .collect(Collectors.toList()));
-            for (LogRecord record : warnings) {
-                Assertions.assertEquals(Level.WARNING.intValue(), record.getLevel().intValue(),
-                        "the bypass is a warning, not something quieter: " + record.getMessage());
-                Assertions.assertTrue(record.getMessage().contains("javax.sql.XADataSource"),
-                        "the report must name the backing that causes it: " + record.getMessage());
-                Assertions.assertTrue(record.getMessage().contains("XAConnection.getConnection()"),
-                        "the report must name the route the statements escape by: " + record.getMessage());
-            }
         }
 
 
