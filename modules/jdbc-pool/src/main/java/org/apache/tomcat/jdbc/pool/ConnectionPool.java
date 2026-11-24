@@ -625,7 +625,7 @@ public class ConnectionPool {
         // connection and re-armed for the next borrower. (The
         // useStatementFacade property that used to switch this off is
         // deprecated and no longer has any effect.)
-        handler = new StatementFacade(handler);
+        handler = new StatementFacade(handler, con);
         Connection connection;
         try {
             Constructor<?> proxyConstructor = getProxyConstructor(con.getXAConnection() != null);
@@ -2220,6 +2220,10 @@ public class ConnectionPool {
                         raw.commit();
                     }
                 }
+                // The return path ended the transaction (or the session was in
+                // auto-commit mode and had none); a later borrow no longer
+                // needs to terminate one.
+                con.clearTransactionDirty();
             }
             return true;
         } catch (SQLException x) {

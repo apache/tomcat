@@ -112,6 +112,16 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     private volatile boolean discarded = false;
     /**
+     * Whether a statement has executed, or a row has been changed, since the transaction was last ended. A transaction
+     * exists on the session only when auto-commit is off and work has been done in it; the state interceptor uses this
+     * marker to decide whether a borrow must roll a pending transaction back, instead of paying a rollback round trip
+     * on every borrow of a pool whose sessions run in manual commit mode. It is raised before the execution reaches
+     * the driver, so a failed execution whose transaction state is unknown still forces the rollback. Ending
+     * operations - {@code commit()}, {@code rollback()} without a savepoint and {@code setAutoCommit(true)} - clear it
+     * once the driver accepted them; a validation that ends the transaction itself clears it the same way.
+     */
+    private volatile boolean transactionDirty = false;
+    /**
      * The Timestamp when the last time the connect() method was called successfully
      */
     private volatile long lastConnected = -1;
@@ -302,6 +312,8 @@ public class PooledConnection implements PooledConnectionMBean {
                 }
             }
             this.lastConnected = System.currentTimeMillis();
+            // A new session starts with no transaction of a previous borrower on it.
+            this.transactionDirty = false;
             // The validation timestamp belongs to the session that was just given
             // up: a new physical session must be due for its own validation, or a
             // recently validated predecessor lets the configured testOnBorrow /
@@ -1103,6 +1115,7 @@ public class PooledConnection implements PooledConnectionMBean {
             // across the reconnect window while the per-connection MBean stays
             // registered.
             lastValidated = 0;
+            transactionDirty = false;
         }
         if (session != null) {
             // The session fields have already been cleared, so this notification
@@ -1542,6 +1555,7 @@ public class PooledConnection implements PooledConnectionMBean {
             if (!connection.getAutoCommit()) {
                 connection.commit();
             }
+            transactionDirty = false;
             return true;
         } catch (SQLException e) {
             log.debug("Failed to commit transaction", PoolUtilities.maskCredentials(e));
@@ -1570,6 +1584,7 @@ public class PooledConnection implements PooledConnectionMBean {
             if (!connection.getAutoCommit()) {
                 connection.rollback();
             }
+            transactionDirty = false;
             return true;
         } catch (SQLException e) {
             log.debug("Failed to rollback transaction", PoolUtilities.maskCredentials(e));
@@ -1809,6 +1824,35 @@ public class PooledConnection implements PooledConnectionMBean {
     @Override
     public boolean isDiscarded() {
         return discarded;
+    }
+
+    /**
+     * Returns whether a statement has executed, or a row has been changed, since the transaction was last ended. A
+     * connection running in manual commit mode can hold an open transaction only after work has been done in it, so the
+     * state interceptor uses this marker to skip a rollback that would have nothing to undo. The marker is raised
+     * before the work reaches the driver and cleared when {@code commit()}, {@code rollback()} without a savepoint or
+     * {@code setAutoCommit(true)} succeeds, or when a validation ends the transaction itself.
+     *
+     * @return {@code true} if work may have been done since the last transaction-ending operation
+     */
+    public boolean isTransactionDirty() {
+        return transactionDirty;
+    }
+
+    /**
+     * Clears the transaction-dirty marker after the pending transaction has been terminated, or when the session is
+     * known to have no transaction to terminate.
+     */
+    public void clearTransactionDirty() {
+        transactionDirty = false;
+    }
+
+    /**
+     * Marks the session as having work that may belong to an open transaction. Called by the statement facade before a
+     * statement execution or a result set row change reaches the driver.
+     */
+    void markTransactionDirty() {
+        transactionDirty = true;
     }
 
     /**
