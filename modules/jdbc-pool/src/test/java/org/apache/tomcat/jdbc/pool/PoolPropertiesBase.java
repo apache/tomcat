@@ -239,6 +239,27 @@ abstract class PoolPropertiesBase {
     }
 
     @Test
+    void aFailingGetterTextIsMaskedAndFlattenedInTheDump() {
+        PoolProperties properties = new PoolProperties() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public String getUrl() {
+                throw new RuntimeException("failed for jdbc:h2:mem:test;PASSWORD=leaked\nforged");
+            }
+        };
+
+        String dump = properties.toString();
+
+        Assertions.assertFalse(dump.contains("leaked"),
+                "a credential carried by a failing getter must not reach the dump, was: " + dump);
+        Assertions.assertTrue(dump.contains("PASSWORD=********"),
+                "the credential must be masked in place, was: " + dump);
+        Assertions.assertFalse(dump.contains("\nforged") || dump.contains("\rforged"),
+                "a line break in the failure text must not forge a dump line, was: " + dump);
+    }
+
+    @Test
     void getJdbcInterceptorsAsArrayReturnsACopy() {
         PoolProperties properties = new PoolProperties();
         properties.setJdbcInterceptors("ResetAbandonedTimer");
