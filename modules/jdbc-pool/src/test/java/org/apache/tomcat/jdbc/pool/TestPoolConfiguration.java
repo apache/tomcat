@@ -46,4 +46,8 @@ class TestPoolConfiguration {
     class LiveConfigurationSnapshot extends LiveConfigurationSnapshotBase {
     }
 
+    @Nested
+    class RetainedBuilderConfiguration extends RetainedBuilderConfigurationBase {
+    }
+
 }

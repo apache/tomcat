@@ -54,6 +54,16 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
      * a configuration the pool believes in and a task running on another interval
      * look the same from the getters.
      */
+    /*
+     * The pool's live configuration object. A test that instruments a running
+     * pool must instrument the object the pool reads, not the caller's object
+     * the pool was constructed from: those are deliberately different after
+     * construction.
+     */
+    private static HookedSweeperProperties liveProperties(DataSource ds) {
+        return (HookedSweeperProperties) ds.getPool().getMutableConfiguration();
+    }
+
     private static long registeredCleanerPeriod() {
         long period = -1;
         for (TimerTask task : org.apache.tomcat.jdbc.pool.ConnectionPool.getPoolCleaners()) {
@@ -305,7 +315,7 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
             }
         }, "concurrent-sweeper-write");
 
-        properties.onDecisionCheck = () -> {
+        liveProperties(ds).onDecisionCheck = () -> {
             // The writer turning its trigger off is preempted right here, between
             // the reading its outcome is decided from and the stop that follows it.
             // The second write is started inside that window; whether it gets as
@@ -366,7 +376,7 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
             }
         }, "concurrent-mbean-sweeper-write");
 
-        properties.onDecisionCheck = () -> {
+        liveProperties(ds).onDecisionCheck = () -> {
             second.start();
             try {
                 secondWriteDone.await(500, TimeUnit.MILLISECONDS);
@@ -535,17 +545,19 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
         Assertions.assertEquals(9000, registeredCleanerPeriod(),
                 "precondition: the cleaner is armed on the interval the pool was created with");
 
-        // Written past the setter, so nothing validates it: this is the pair out of
-        // agreement that the check exists to put right.
-        properties.setMaxAge(3000);
-        Assertions.assertEquals(9000, properties.getTimeBetweenEvictionRunsMillis(),
+        // Written directly on the pool's live builder, past the setter, so
+        // nothing validates it: this is the pair out of agreement that the
+        // check exists to put right.
+        PoolConfiguration live = ds.getPool().getMutableConfiguration();
+        live.setMaxAge(3000);
+        Assertions.assertEquals(9000, live.getTimeBetweenEvictionRunsMillis(),
                 "precondition: the interval has not been corrected by the raw write");
         Assertions.assertEquals(9000, registeredCleanerPeriod(),
                 "precondition: and the task still runs on the interval it was built with");
 
         ds.setMaxActive(4);
 
-        Assertions.assertEquals(3000, properties.getTimeBetweenEvictionRunsMillis(),
+        Assertions.assertEquals(3000, live.getTimeBetweenEvictionRunsMillis(),
                 "precondition: the count write triggered the correction");
         Assertions.assertEquals(3000, registeredCleanerPeriod(),
                 "a count write is not the moment to leave the cleaner running on an "
@@ -571,13 +583,14 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
         Assertions.assertEquals(9000, registeredCleanerPeriod(),
                 "precondition: the cleaner is armed on the interval the pool was created with");
 
-        properties.setMaxAge(3000);
-        Assertions.assertEquals(9000, properties.getTimeBetweenEvictionRunsMillis(),
+        PoolConfiguration live = ds.getPool().getMutableConfiguration();
+        live.setMaxAge(3000);
+        Assertions.assertEquals(9000, live.getTimeBetweenEvictionRunsMillis(),
                 "precondition: the interval has not been corrected by the raw write");
 
         jmx.setMaxActive(4);
 
-        Assertions.assertEquals(3000, properties.getTimeBetweenEvictionRunsMillis(),
+        Assertions.assertEquals(3000, live.getTimeBetweenEvictionRunsMillis(),
                 "precondition: the count write triggered the correction");
         Assertions.assertEquals(3000, registeredCleanerPeriod(),
                 "the MBean and the data source run the same check, so neither may leave the "
@@ -617,7 +630,8 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
             }
         }, "concurrent-sweeper-enable");
 
-        properties.onSweeperCheck = () -> {
+        HookedSweeperProperties live = liveProperties(ds);
+        live.onSweeperCheck = () -> {
             // The disabling write is preempted at its first look at the sweeper
             // state. The enable lands inside that window, so whatever this writer
             // learns on its way is already overtaken by the time it acts.
@@ -629,8 +643,8 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
                 throw new AssertionError(e);
             }
         };
-        properties.checks.set(0);
-        properties.fireOnCheck = 1;
+        live.checks.set(0);
+        live.fireOnCheck = 1;
 
         ds.setTimeBetweenEvictionRunsMillis(0);
         second.join(5000);
@@ -671,7 +685,8 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
             }
         }, "concurrent-sweeper-enable-mbean");
 
-        properties.onSweeperCheck = () -> {
+        HookedSweeperProperties live = liveProperties(ds);
+        live.onSweeperCheck = () -> {
             // As above: the preemption is the disabling write's own first reading
             // of the sweeper state, and the enable lands inside it.
             second.start();
@@ -682,8 +697,8 @@ abstract class PoolSweeperSettersBase extends JdbcPoolBaseTest {
                 throw new AssertionError(e);
             }
         };
-        properties.checks.set(0);
-        properties.fireOnCheck = 1;
+        live.checks.set(0);
+        live.fireOnCheck = 1;
 
         jmx.setTimeBetweenEvictionRunsMillis(0);
         second.join(5000);

@@ -104,9 +104,11 @@ public class ConnectionPool {
     private PoolConfiguration poolProperties;
 
     /**
-     * The mutable configuration builder the bean and JMX surfaces still write, kept for compatibility. The pool never
-     * changes it directly: writes go through the live view and the apply path, which validates the candidate and
-     * publishes the immutable snapshot.
+     * The pool's private mutable configuration builder, which the bean and JMX surfaces still write. During
+     * construction it is the caller's configuration object; once the pool is built it is replaced by a private clone,
+     * so a caller that keeps the object it passed can no longer change the pool's operational configuration. The pool
+     * never changes the builder directly: writes go through the live view and the apply path, which validates the
+     * candidate and publishes the immutable snapshot.
      */
     private PoolConfiguration mutableConfiguration;
 
@@ -267,6 +269,11 @@ public class ConnectionPool {
     /**
      * Instantiate a connection pool. This will create connections if initialSize is larger than 0. The
      * {@link PoolProperties} should not be reused for another connection pool.
+     * <p>
+     * The pool keeps its own copy of the configuration. The object passed here is the construction builder: the
+     * startup callbacks and the management surfaces may write it while the pool is being built, and the pool picks
+     * those writes up. Once the constructor returns, the caller's object is no longer a configuration surface for
+     * this pool; writes to it do not change the pool's live configuration or its connections.
      *
      * @param prop PoolProperties - all the properties for this connection pool
      *
@@ -463,6 +470,30 @@ public class ConnectionPool {
      */
     static PoolProperties copyConfiguration(PoolConfiguration source) {
         return PoolProperties.copyOf(source);
+    }
+
+    /**
+     * Copies a configuration into the pool's private mutable builder. Unlike the immutable snapshot copy, the builder
+     * copy keeps the source's concrete configuration class: a configuration subclass may carry behaviour its pool
+     * readers rely on, and clone() carries that behaviour and the subclass's own state, while still making the builder
+     * a distinct object the caller cannot reach.
+     *
+     * @param source the configuration to copy
+     *
+     * @return the builder copy
+     */
+    private static PoolConfiguration copyMutableConfiguration(PoolConfiguration source) {
+        if (source instanceof PoolProperties) {
+            try {
+                return (PoolConfiguration) ((PoolProperties) source).clone();
+            } catch (CloneNotSupportedException x) {
+                // PoolProperties implements Cloneable, so this cannot happen for
+                // a configuration it created; fall back to the field copy for a
+                // subclass that refuses cloning.
+                ExceptionUtils.handleThrowable(x);
+            }
+        }
+        return copyConfiguration(source);
     }
 
     /**
@@ -989,19 +1020,25 @@ public class ConnectionPool {
      * @throws SQLException if initialization fails
      */
     protected void init(PoolConfiguration properties) throws SQLException {
+        // The caller's configuration is the construction builder: the startup
+        // callbacks and the management surfaces write it while the pool is being
+        // built, and the construction picks up those writes. It is replaced by a
+        // private clone before init() returns (see the end of this method), so
+        // that the caller's object stops being a write surface once the pool is
+        // live.
         mutableConfiguration = properties;
         initializing = true;
         startedInterceptorCount = 0;
         try {
 
             // Make sure the pool is properly configured
-            checkPoolConfiguration(properties);
+            checkPoolConfiguration(mutableConfiguration);
 
             // Take the immutable snapshot the connect and credential paths read,
             // and publish the live view the rest of the pool and the management
-            // surfaces use. The builder stays mutable for compatibility; the
-            // snapshot is replaced atomically by the apply path.
-            configurationSnapshot = copyConfiguration(properties);
+            // surfaces use. The snapshot is replaced atomically by the apply
+            // path; the pool's private builder is the single mutable surface.
+            configurationSnapshot = copyConfiguration(mutableConfiguration);
             configurationView = PoolConfigurationView.create(this);
             poolProperties = configurationView;
 
@@ -1009,12 +1046,12 @@ public class ConnectionPool {
             // interceptors are told about the pool, so that everything the start
             // registers under the name and everything a later lookup of it
             // resolves through one record (see the field).
-            registrationName = properties.getPoolName();
+            registrationName = mutableConfiguration.getPoolName();
 
             // Both queues are unbounded by design: membership is bounded by the
             // maxActive/size bookkeeping, not by queue capacity.
             busy = new LinkedBlockingQueue<>();
-            if (properties.isFairQueue()) {
+            if (mutableConfiguration.isFairQueue()) {
                 idle = new FairBlockingQueue<>();
             } else {
                 idle = new LinkedBlockingQueue<>();
@@ -1086,8 +1123,8 @@ public class ConnectionPool {
             // The startup callbacks above can still change the builder while the
             // pool is not published. Take that final startup state before the
             // pre-load and the cleaner read the configuration.
-            checkPoolConfiguration(properties);
-            configurationSnapshot = copyConfiguration(properties);
+            checkPoolConfiguration(mutableConfiguration);
+            configurationSnapshot = copyConfiguration(mutableConfiguration);
             poolProperties = configurationView;
             if (isClosed()) {
                 return;
@@ -1161,6 +1198,18 @@ public class ConnectionPool {
                 ex.initCause(x);
                 throw ex;
             }
+
+            // The construction is over. Replace the caller's configuration - the
+            // construction builder the startup callbacks and management surfaces
+            // have been writing - with a private clone, so that a caller that
+            // kept the object it passed here can no longer change the pool's
+            // operational configuration by writing to it. The clone keeps the
+            // configuration's concrete class, so any behaviour a configuration
+            // subclass contributes to the live view is preserved. The snapshot
+            // is refreshed from the same state, which is the state the pre-load
+            // and the cleaner were built from.
+            mutableConfiguration = copyMutableConfiguration(mutableConfiguration);
+            configurationSnapshot = copyConfiguration(mutableConfiguration);
 
             // The closed flag starts false for a new object and is not reset here:
             // a close performed while this initialization was running (from a
