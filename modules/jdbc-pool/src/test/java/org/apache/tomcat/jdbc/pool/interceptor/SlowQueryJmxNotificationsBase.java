@@ -31,7 +31,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -173,6 +175,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
             }
         }
 
+        awaitNotificationCount(received, 2);
         List<String> messages = received.stream().map(Notification::getMessage)
                 .collect(Collectors.toList());
         Assertions.assertEquals(2, messages.size(),
@@ -242,6 +245,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
             }
         }
 
+        awaitNotificationCount(received, 1);
         Assertions.assertEquals(1, received.size(), "the query must have notified");
         Assertions.assertEquals(oname, received.get(0).getSource(),
                 "the source must be the ObjectName the MBean is registered under: it is what"
@@ -281,6 +285,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
             }
         }
 
+        awaitNotificationCount(received, 1);
         Assertions.assertEquals(1, received.size(), "the query must have notified");
         Assertions.assertEquals(customOname, received.get(0).getSource(),
                 "the source must name the MBean by the configured override it was"
@@ -325,6 +330,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
             }
         }
 
+        awaitNotificationCount(received, 2);
         Assertions.assertEquals(2, received.size(),
                 "both reporting definitions of the chain see the query and notify");
         for (Notification notification : received) {
@@ -374,6 +380,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
             }
         }
 
+        awaitNotificationCount(received, 1);
         Assertions.assertEquals(1, received.size(),
                 "an unregistrable pool must still notify its local listeners");
         Object source = received.get(0).getSource();
@@ -419,6 +426,9 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
                     st2.execute(slowSql(2));
                 }
             }
+            // delivery is asynchronous; let both notifications arrive before
+            // the listener is removed and the list is asserted
+            awaitNotificationCount(received, 2);
             server.removeNotificationListener(oname, listener);
         }
 
@@ -431,6 +441,67 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
         Assertions.assertTrue(messages.stream().anyMatch(m -> m.contains("SELECT 2")),
                 "the query run on the second physical connection must also reach the listener, received: "
                         + messages);
+    }
+
+    @Test
+    void notifyPoolFalseDoesNotRunAListenerOnTheQueryThread() throws Exception {
+        String poolName = "JmxNotifyNoBlock-" + System.nanoTime();
+        DataSource ds = newDataSource();
+        ds.setName(poolName);
+        ds.setJdbcInterceptors(SlowQueryReportJmx.class.getName() + "(notifyPool=false,threshold=0)");
+        ds.getPoolProperties().setMaxActive(2);
+        ds.getPoolProperties().setInitialSize(0);
+
+        MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+        ObjectName oname = new ObjectName("tomcat.jdbc:type="
+                + SlowQueryReportJmx.class.getName() + ",name=" + poolName);
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        NotificationListener blockingListener = (notification, handback) -> {
+            entered.countDown();
+            try {
+                release.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException x) {
+                Thread.currentThread().interrupt();
+            }
+        };
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread query = new Thread(() -> {
+            try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
+                st.execute(slowSql(99));
+            } catch (Throwable x) {
+                failure.set(x);
+            }
+        }, "slow-query");
+        query.setDaemon(true);
+
+        try {
+            ds.createPool();
+            try (Connection held = ds.getConnection()) {
+                Assertions.assertNotNull(held, "the borrow that publishes the MBean must succeed");
+                Assertions.assertTrue(server.isRegistered(oname),
+                        "the interceptor MBean must be registered before the query runs");
+                server.addNotificationListener(oname, blockingListener, null, null);
+
+                query.start();
+                Assertions.assertTrue(entered.await(AWAIT_TIMEOUT_MS, TimeUnit.MILLISECONDS),
+                        "the blocking listener must be reached by the slow-query notification");
+                query.join(TimeUnit.SECONDS.toMillis(2));
+                Assertions.assertFalse(query.isAlive(),
+                        "the query thread must complete while a notification listener is blocked");
+                Assertions.assertNull(failure.get(),
+                        () -> "the query must still complete successfully: " + failure.get());
+            }
+        } finally {
+            release.countDown();
+            query.join(AWAIT_TIMEOUT_MS);
+            try {
+                server.removeNotificationListener(oname, blockingListener);
+            } catch (ListenerNotFoundException x) {
+                // the pool may have released the registration already
+            }
+            ds.close();
+        }
     }
 
     @Test
@@ -491,6 +562,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
                     Statement st = survivor.createStatement()) {
                 st.execute(slowSql(3));
             }
+            awaitNotificationMessage(received, "SELECT 3");
 
             List<String> messages = received.stream().map(Notification::getMessage)
                     .collect(Collectors.toList());
@@ -623,14 +695,14 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
             try (Statement st = ownerConnection.createStatement()) {
                 st.execute(slowSql(1));
             }
-            Assertions.assertTrue(published.stream().anyMatch(n -> n.getMessage().contains("SELECT 1")),
+            Assertions.assertTrue(awaitNotificationMessage(published, "SELECT 1"),
                     "the pool's queries reach the listeners of its MBean, received: "
                             + published);
 
             try (Statement st = otherConnection.createStatement()) {
                 st.execute(slowSql(2));
             }
-            Assertions.assertTrue(otherPublished.stream().anyMatch(n -> n.getMessage().contains("SELECT 2")),
+            Assertions.assertTrue(awaitNotificationMessage(otherPublished, "SELECT 2"),
                     "the other pool must notify its own listeners, received: " + otherPublished);
             Assertions.assertFalse(published.stream().anyMatch(n -> n.getMessage().contains("SELECT 2")),
                     "and it must not report into the other pool's MBean: a client listening to the"
@@ -650,7 +722,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
                     "closing a pool gives up its own publication");
             Assertions.assertTrue(server.isRegistered(ownerOn),
                     "closing one pool must leave the other pool's publication standing");
-            Assertions.assertTrue(published.stream().anyMatch(n -> n.getMessage().contains("SELECT 3")),
+            Assertions.assertTrue(awaitNotificationMessage(published, "SELECT 3"),
                     "and its clients' listeners must still be served, received: " + published);
         } finally {
             if (ownerConnection != null) {
@@ -736,6 +808,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
         // both instances of the chain see the one query; both must notify
         // through the single registered MBean - none of them into a
         // broadcaster of its own
+        awaitNotificationCount(received, 2);
         List<String> messages = received.stream().map(Notification::getMessage)
                 .collect(Collectors.toList());
         Assertions.assertEquals(2, messages.size(),
@@ -923,8 +996,7 @@ abstract class SlowQueryJmxNotificationsBase extends JdbcPoolBaseTest {
                 try (Statement st = first.createStatement()) {
                     st.execute(slowSql(1));
                 }
-                Assertions.assertTrue(
-                        received.stream().anyMatch(n -> n.getMessage().contains("SELECT 1")),
+                Assertions.assertTrue(awaitNotificationMessage(received, "SELECT 1"),
                         "a pool whose publication was refused must still notify its own listeners,"
                                 + " received: " + received);
             }
