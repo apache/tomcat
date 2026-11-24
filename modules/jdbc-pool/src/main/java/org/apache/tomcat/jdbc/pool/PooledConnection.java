@@ -254,7 +254,7 @@ public class PooledConnection implements PooledConnectionMBean {
         if (released.get()) {
             throw new SQLException(MessageFactory.get("pooledConnection.cannotReestablish"));
         }
-        PoolConfiguration configuration = configuration();
+        PoolConfiguration configuration = connectConfiguration();
         if (connection != null || xaConnection != null || cpdsConnection != null) {
             try {
                 this.disconnect(false);
@@ -278,9 +278,9 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         try {
             if (configuration.getDataSource() != null) {
-                connectUsingDataSource();
+                connectUsingDataSource(configuration);
             } else {
-                connectUsingDriver();
+                connectUsingDriver(configuration);
             }
 
             // Set up the default state, unless we expect the interceptor to do it
@@ -424,7 +424,17 @@ public class PooledConnection implements PooledConnectionMBean {
      * @throws SQLException if unable to obtain a connection from the DataSource
      */
     protected void connectUsingDataSource() throws SQLException {
-        PoolConfiguration configuration = connectConfiguration();
+        connectUsingDataSource(connectConfiguration());
+    }
+
+    /**
+     * Connects using the DataSource held by the given configuration generation.
+     *
+     * @param configuration the configuration generation this connect reads
+     *
+     * @throws SQLException if unable to obtain a connection from the DataSource
+     */
+    protected void connectUsingDataSource(PoolConfiguration configuration) throws SQLException {
         String usr;
         String pwd;
         // A caller-supplied configuration is still mutable and its credential
@@ -589,7 +599,17 @@ public class PooledConnection implements PooledConnectionMBean {
      * @throws SQLException if unable to instantiate the driver or obtain a connection
      */
     protected void connectUsingDriver() throws SQLException {
-        PoolConfiguration configuration = connectConfiguration();
+        connectUsingDriver(connectConfiguration());
+    }
+
+    /**
+     * Connects using the JDBC Driver class held by the given configuration generation.
+     *
+     * @param configuration the configuration generation this connect reads
+     *
+     * @throws SQLException if unable to instantiate the driver or obtain a connection
+     */
+    protected void connectUsingDriver(PoolConfiguration configuration) throws SQLException {
         String configuredDriver = configuration.getDriverClassName();
         try {
             if (driver != null && !Objects.equals(driverClass, configuredDriver)) {

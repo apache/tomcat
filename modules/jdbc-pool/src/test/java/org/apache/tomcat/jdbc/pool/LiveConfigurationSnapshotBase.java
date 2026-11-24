@@ -16,6 +16,9 @@
  */
 package org.apache.tomcat.jdbc.pool;
 
+import java.io.PrintWriter;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverPropertyInfo;
@@ -92,6 +95,117 @@ abstract class LiveConfigurationSnapshotBase {
         props.setUsername("olduser");
         props.setPassword("oldpass");
         return props;
+    }
+
+    /** A connection object only the route test needs; nothing is expected to call it after the hand-over. */
+    private static final Connection FAKE_CONNECTION = (Connection) Proxy.newProxyInstance(
+            LiveConfigurationSnapshotBase.class.getClassLoader(), new Class<?>[] { Connection.class },
+            new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, java.lang.reflect.Method method, Object[] args) {
+                    String name = method.getName();
+                    if ("toString".equals(name)) {
+                        return "fake connection";
+                    }
+                    if ("hashCode".equals(name)) {
+                        return Integer.valueOf(System.identityHashCode(proxy));
+                    }
+                    if ("equals".equals(name)) {
+                        return Boolean.valueOf(proxy == args[0]);
+                    }
+                    if ("close".equals(name)) {
+                        return null;
+                    }
+                    if ("isClosed".equals(name)) {
+                        return Boolean.FALSE;
+                    }
+                    throw new UnsupportedOperationException(name);
+                }
+            });
+
+    /** A data source that hands out the fake connection and records no state of its own. */
+    private static final class FakeDataSource implements javax.sql.DataSource {
+
+        @Override
+        public Connection getConnection() {
+            return FAKE_CONNECTION;
+        }
+
+        @Override
+        public Connection getConnection(String username, String password) {
+            return FAKE_CONNECTION;
+        }
+
+        @Override
+        public PrintWriter getLogWriter() {
+            return null;
+        }
+
+        @Override
+        public void setLogWriter(PrintWriter out) {
+            // NOOP
+        }
+
+        @Override
+        public void setLoginTimeout(int seconds) {
+            // NOOP
+        }
+
+        @Override
+        public int getLoginTimeout() {
+            return 0;
+        }
+
+        @Override
+        public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+            throw new SQLFeatureNotSupportedException();
+        }
+
+        @Override
+        public boolean isWrapperFor(Class<?> iface) {
+            return false;
+        }
+
+        @Override
+        public <T> T unwrap(Class<T> iface) throws SQLException {
+            throw new SQLException("the fake data source is not a wrapper");
+        }
+    }
+
+    /**
+     * Parks inside the data-source connect at either the no-argument entry point (the pre-fix call from
+     * {@code connect()}) or the configuration-carrying one (the post-fix call), so the test can replace the live
+     * configuration after the route decision but before the body reads its snapshot.
+     */
+    private static final class ParkingConnection extends PooledConnection {
+
+        static volatile CountDownLatch entered = new CountDownLatch(1);
+        static volatile CountDownLatch release = new CountDownLatch(1);
+
+        ParkingConnection(PoolConfiguration properties, ConnectionPool parent) {
+            super(properties, parent);
+        }
+
+        private static void park() {
+            entered.countDown();
+            try {
+                release.await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException x) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        @Override
+        protected void connectUsingDataSource() throws SQLException {
+            park();
+            super.connectUsingDataSource();
+        }
+
+        @Override
+        protected void connectUsingDataSource(PoolConfiguration configuration) throws SQLException {
+            park();
+            super.connectUsingDataSource(configuration);
+        }
     }
 
     @Test
@@ -251,5 +365,46 @@ abstract class LiveConfigurationSnapshotBase {
         Assertions.assertNull(failure.get(), () -> "the snapshot copy failed: " + failure.get());
         Assertions.assertEquals("new", copied.get().getDbProperties().getProperty("generation"),
                 "the snapshot copy must wait for the source monitor and capture the completed generation");
+    }
+
+    @Test
+    void aConnectKeepsTheConfigurationGenerationItsRouteWasChosenFrom() throws Exception {
+        ParkingConnection.entered = new CountDownLatch(1);
+        ParkingConnection.release = new CountDownLatch(1);
+        PoolProperties props = properties();
+        props.setDataSource(new FakeDataSource());
+        ConnectionPool pool = new ConnectionPool(props);
+        PooledConnection con = new ParkingConnection(pool.getPoolProperties(), pool);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Thread connect = new Thread(() -> {
+            try {
+                con.connect();
+            } catch (Throwable x) {
+                failure.set(x);
+            }
+        }, "configuration-generation-connect");
+        connect.setDaemon(true);
+        try {
+            connect.start();
+            Assertions.assertTrue(ParkingConnection.entered.await(10, TimeUnit.SECONDS),
+                    "the connect must reach the data source route");
+
+            // Replace the live configuration after the route was chosen: the
+            // published snapshot now carries no data source at all.
+            pool.getPoolProperties().setDataSource(null);
+            Assertions.assertNull(pool.getCurrentConfiguration().getDataSource(),
+                    "precondition: the published snapshot no longer carries a data source");
+
+            ParkingConnection.release.countDown();
+            connect.join(TimeUnit.SECONDS.toMillis(10));
+            Assertions.assertFalse(connect.isAlive(), "the connect must finish");
+            Assertions.assertNull(failure.get(),
+                    () -> "the connect must stay on the generation it started with: " + failure.get());
+            Assertions.assertNotNull(con.getConnection(),
+                    "a route chosen from the starting snapshot must still find its data source in the connect body");
+        } finally {
+            ParkingConnection.release.countDown();
+            pool.close(true);
+        }
     }
 }
