@@ -411,6 +411,15 @@
         Fix the parsing of chunk header lines so that a CR that has been consumed
         is always followed by an LF. (markt)
       </fix>
+      <fix>
+        Fix a HTTP/2 request that is in asynchronous mode when it enters an error
+        state that still permits I/O, such as when
+        <code>swallowAbortedUploads</code> is <code>false</code> and a form POST
+        declares a body larger than <code>maxPostSize</code>. The request and
+        response were recycled, and returned to the pool for re-use, while the
+        application still owned them. The stream is now closed once asynchronous
+        processing ends. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
