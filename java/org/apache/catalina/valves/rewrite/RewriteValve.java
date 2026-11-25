@@ -563,6 +563,8 @@ public class RewriteValve extends ValveBase {
                     if (rounds >= MAX_REWRITE_ROUNDS) {
                         containerLog.warn(sm.getString("rewriteValve.maxRounds",
                                 Integer.valueOf(MAX_REWRITE_ROUNDS), request.getRequestURI()));
+                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                        done = true;
                         break;
                     }
                     rounds++;
