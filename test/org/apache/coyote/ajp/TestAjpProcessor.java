@@ -19,10 +19,17 @@ package org.apache.coyote.ajp;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.annotation.PreDestroy;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.WebConnection;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -100,6 +107,94 @@ public class TestAjpProcessor extends AjpBaseTest {
                 servlet.getUris().contains("/injected"));
 
         ajpClient.disconnect();
+    }
+
+
+    /*
+     * HTTP upgrade is not supported by AJP. The attempt to upgrade must fail and the HttpUpgradeHandler instance, that
+     * has been created by the time the failure is detected, must be destroyed rather than leaked.
+     */
+    @Test
+    public void testUpgradeNotSupported() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        UpgradeAttemptServlet servlet = new UpgradeAttemptServlet();
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        SimpleAjpClient ajpClient = new SimpleAjpClient();
+        ajpClient.setPort(getPort());
+        ajpClient.connect();
+
+        TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
+        forwardMessage.end();
+        TesterAjpMessage responseHeaders = ajpClient.sendMessage(forwardMessage);
+        TestAbstractAjpProcessor.validateResponseHeaders(responseHeaders, 200, "200");
+
+        Assert.assertTrue(servlet.attempted.await(5, TimeUnit.SECONDS));
+        Assert.assertTrue("The upgrade attempt must fail", servlet.failure.get() != null);
+        Assert.assertTrue(servlet.failure.get().toString(),
+                servlet.failure.get() instanceof UnsupportedOperationException);
+        Assert.assertTrue("The HttpUpgradeHandler must have been created", UpgradeAttemptHandler.created.get());
+        Assert.assertTrue("The HttpUpgradeHandler must be destroyed", UpgradeAttemptHandler.destroyed.get());
+        Assert.assertFalse("The HttpUpgradeHandler must not be initialised", UpgradeAttemptHandler.initialised.get());
+        Assert.assertFalse("destroy() must not be called if init() was not called",
+                UpgradeAttemptHandler.destroyMethodCalled.get());
+
+        ajpClient.disconnect();
+    }
+
+
+    static final class UpgradeAttemptServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final transient CountDownLatch attempted = new CountDownLatch(1);
+        private final transient AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        @Override
+        protected void service(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            try {
+                req.upgrade(UpgradeAttemptHandler.class);
+            } catch (Throwable t) {
+                failure.set(t);
+            }
+            resp.setStatus(HttpServletResponse.SC_OK);
+            attempted.countDown();
+        }
+    }
+
+
+    public static class UpgradeAttemptHandler implements HttpUpgradeHandler {
+
+        static final AtomicBoolean created = new AtomicBoolean();
+        static final AtomicBoolean initialised = new AtomicBoolean();
+        static final AtomicBoolean destroyed = new AtomicBoolean();
+        static final AtomicBoolean destroyMethodCalled = new AtomicBoolean();
+
+        public UpgradeAttemptHandler() {
+            created.set(true);
+        }
+
+        @Override
+        public void init(WebConnection connection) {
+            initialised.set(true);
+        }
+
+        @Override
+        public void destroy() {
+            destroyMethodCalled.set(true);
+        }
+
+        @PreDestroy
+        public void preDestroy() {
+            destroyed.set(true);
+        }
     }
 
 
