@@ -2548,6 +2548,229 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
 
     /*
+     * The request URI includes dot segments that return to the context path. The remainder of the URI must still be
+     * used for the dispatch. The servlet should see exactly the same path info before and after the dispatch.
+     */
+    @Test
+    public void testAsyncDispatchDotSegmentsAfterContextPath() throws Exception {
+        doTestAsyncDispatchPath("/test/../test/semicolon/foo", "/foo|/foo");
+    }
+
+
+    @Test
+    public void testAsyncDispatchDotSegmentsAfterContextPathRepeated() throws Exception {
+        doTestAsyncDispatchPath("/test/../test/../test/semicolon/foo", "/foo|/foo");
+    }
+
+
+    /*
+     * The dot segments that climb out of the context follow other segments rather than immediately following the
+     * context path.
+     */
+    @Test
+    public void testAsyncDispatchDotSegmentsLaterClimbOutOfContext() throws Exception {
+        doTestAsyncDispatchPath("/test/a/b/c/../../../../test/semicolon/foo", "/foo|/foo");
+    }
+
+
+    @Test
+    public void testAsyncDispatchEncodedDotSegmentsAfterContextPath() throws Exception {
+        doTestAsyncDispatchPath("/test/%2e%2e/test/semicolon/foo", "/foo|/foo");
+    }
+
+
+    /*
+     * A failed dispatch must not change the state of the request. The application must be able to recover from the
+     * failure. In particular, the async attributes that record the original request must not have been set by the
+     * failed attempt.
+     */
+    @Test
+    public void testAsyncDispatchFailureLeavesRequestUnchanged() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("/test", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) context.getJarScanner()).setScanClassPath(false);
+
+        Wrapper w = Tomcat.addServlet(context, "recover", new AsyncDispatchFailureServlet());
+        w.setAsyncSupported(true);
+        context.addServletMapping("/recover", "recover");
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/recover", responseBody, null);
+
+        Assert.assertEquals(200, rc);
+        // Failed with UnsupportedOperationException, no async attribute set, then the recovery dispatch worked
+        Assert.assertEquals("UOE|null|dispatched", responseBody.toString());
+    }
+
+
+    private static class AsyncDispatchFailureServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            if (req.getDispatcherType() == DispatcherType.ASYNC) {
+                resp.setContentType("text/plain");
+                resp.getWriter().print(req.getAttribute("result") + "|dispatched");
+                return;
+            }
+
+            AsyncContext ac = req.startAsync();
+            String result;
+            try {
+                // Escapes the context so there is no dispatcher
+                ac.dispatch("/../outside");
+                result = "dispatched?";
+            } catch (UnsupportedOperationException e) {
+                result = "UOE";
+            }
+            // The async attributes (set when a dispatch is made) must not have been set by the failed attempt
+            result = result + "|" + req.getAttribute(AsyncContext.ASYNC_REQUEST_URI);
+            req.setAttribute("result", result);
+            // Recover from the failure
+            ac.dispatch();
+        }
+    }
+
+
+    /*
+     * The connector decodes encoded solidus so, when the context path is removed from the request URI, an encoded solidus
+     * may be the first character of the path that is used for the dispatch. That is only a valid path if the context
+     * is configured to decode encoded solidus. The servlet must see exactly the same path info before and after the
+     * dispatch.
+     */
+    private static final String[][] ENCODED_SOLIDUS_CASES = {
+            { "/test%2fsemicolon%2ffoo", "/foo|/foo" },
+            { "/test/../test%2fsemicolon/foo", "/foo|/foo" },
+            { "/test%2f..%2ftest%2fsemicolon%2ffoo", "/foo|/foo" },
+            { "/test/../test%2fx/../semicolon/foo", "/foo|/foo" },
+            // Only one level of decoding
+            { "/test%2fsemicolon%2ffoo%252fbar", "/foo%2fbar|/foo%2fbar" } };
+
+
+    @Test
+    public void testAsyncDispatchEncodedSolidusDecodeContextDecode() throws Exception {
+        doTestAsyncDispatchPaths(ENCODED_SOLIDUS_CASES, "decode", "reject", "decode", "reject", false, 200);
+    }
+
+
+    @Test
+    public void testAsyncDispatchEncodedSolidusDecodeContextReject() throws Exception {
+        // The path used for the dispatch starts with an encoded solidus which the context rejects
+        doTestAsyncDispatchPaths(
+                new String[][] { ENCODED_SOLIDUS_CASES[0], ENCODED_SOLIDUS_CASES[1], ENCODED_SOLIDUS_CASES[2] },
+                "decode", "reject", "reject", "reject", false, 500);
+    }
+
+
+    @Test
+    public void testAsyncDispatchEncodedSolidusDecodeContextPassThrough() throws Exception {
+        // The encoded solidus is not decoded so the path used for the dispatch does not start with a '/'
+        doTestAsyncDispatchPaths(new String[][] { ENCODED_SOLIDUS_CASES[0] }, "decode", "reject", "passthrough",
+                "reject", false, 500);
+    }
+
+
+    /*
+     * The encoded solidus are passed through so test%2fx is a single path segment. The dot segments return to the
+     * context path after it. The path used for the dispatch does not contain an encoded solidus so does not depend on
+     * the configuration of the context.
+     */
+    @Test
+    public void testAsyncDispatchEncodedSolidusPassThroughContextReject() throws Exception {
+        doTestAsyncDispatchPaths(new String[][] { { "/test/../test%2fx/../test/semicolon/foo", "/foo|/foo" } },
+                "passthrough", "passthrough", "reject", "reject", false, 200);
+    }
+
+
+    @Test
+    public void testAsyncDispatchEncodedSolidusPassThroughContextPassThrough() throws Exception {
+        doTestAsyncDispatchPaths(new String[][] { { "/test/../test%2fx/../test/semicolon/foo", "/foo|/foo" } },
+                "passthrough", "passthrough", "passthrough", "passthrough", false, 200);
+    }
+
+
+    /*
+     * Path parameters are removed before the request URI is decoded so an encoded solidus or reverse solidus within one
+     * is not a separator. The path used for the dispatch is the path that follows the path parameters.
+     */
+    @Test
+    public void testAsyncDispatchEncodedSeparatorInPathParameter() throws Exception {
+        doTestAsyncDispatchPaths(new String[][] { { "/test;v=%2fignored/semicolon/foo", "/foo|/foo" },
+                { "/test;v=%5cignored/semicolon/foo", "/foo|/foo" } }, "decode", "decode", "decode", "decode", true,
+                200);
+    }
+
+
+    @Test
+    public void testAsyncDispatchEncodedReverseSolidusDecodeContextDecode() throws Exception {
+        doTestAsyncDispatchPaths(
+                new String[][] { { "/test%5csemicolon%5cfoo", "/foo|/foo" },
+                        { "/test/../test%5cx/../semicolon/foo", "/foo|/foo" } },
+                "reject", "decode", "reject", "decode", true, 200);
+    }
+
+
+    @Test
+    public void testAsyncDispatchEncodedReverseSolidusDecodeContextReject() throws Exception {
+        doTestAsyncDispatchPaths(new String[][] { { "/test%5csemicolon%5cfoo", "/foo|/foo" } }, "reject", "decode",
+                "reject", "reject", true, 500);
+    }
+
+
+    private void doTestAsyncDispatchPaths(String[][] cases, String encodedSolidusHandling,
+            String encodedReverseSolidusHandling, String contextEncodedSolidusHandling,
+            String contextEncodedReverseSolidusHandling, boolean allowBackslash, int expectedStatus)
+            throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getConnector().setEncodedSolidusHandling(encodedSolidusHandling);
+        tomcat.getConnector().setEncodedReverseSolidusHandling(encodedReverseSolidusHandling);
+        tomcat.getConnector().setAllowBackslash(allowBackslash);
+        Context context = tomcat.addContext("/test", null);
+        context.setEncodedSolidusHandling(contextEncodedSolidusHandling);
+        context.setEncodedReverseSolidusHandling(contextEncodedReverseSolidusHandling);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) context.getJarScanner()).setScanClassPath(false);
+
+        Wrapper w = Tomcat.addServlet(context, "semicolon", new AsyncDispatchPathInfoServlet());
+        w.setAsyncSupported(true);
+        context.addServletMapping("/semicolon/*", "semicolon");
+        tomcat.start();
+
+        for (String[] testCase : cases) {
+            ByteChunk responseBody = new ByteChunk();
+            int rc = getUrl("http://localhost:" + getPort() + testCase[0], responseBody, null);
+
+            Assert.assertEquals(testCase[0], expectedStatus, rc);
+            if (expectedStatus == 200) {
+                Assert.assertEquals(testCase[0], testCase[1], responseBody.toString());
+            }
+        }
+    }
+
+
+    private void doTestAsyncDispatchPath(String path, String expected) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("/test", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) context.getJarScanner()).setScanClassPath(false);
+
+        Wrapper w = Tomcat.addServlet(context, "semicolon", new AsyncDispatchPathInfoServlet());
+        w.setAsyncSupported(true);
+        context.addServletMapping("/semicolon/*", "semicolon");
+        tomcat.start();
+
+        ByteChunk responseBody = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + path, responseBody, null);
+
+        Assert.assertEquals(200, rc);
+        Assert.assertEquals(expected, responseBody.toString());
+    }
+
+
+    /*
      * Multiple leading slashes in the request URI must not break AsyncContext.dispatch(). The servlet should see
      * exactly the same path info before and after the dispatch.
      */

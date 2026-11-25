@@ -256,16 +256,18 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             if (dispatch != null) {
                 throw new IllegalStateException(sm.getString("asyncContextImpl.dispatchingStarted"));
             }
+            final RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(path);
+            if (!(requestDispatcher instanceof AsyncDispatcher applicationDispatcher)) {
+                // Fail before changing the state of the request so the caller can recover (e.g. complete() or
+                // dispatch to a different path)
+                throw new UnsupportedOperationException(sm.getString("asyncContextImpl.noAsyncDispatcher"));
+            }
             if (request.getAttribute(ASYNC_REQUEST_URI) == null) {
                 request.setAttribute(ASYNC_REQUEST_URI, request.getRequestURI());
                 request.setAttribute(ASYNC_CONTEXT_PATH, request.getContextPath());
                 request.setAttribute(ASYNC_SERVLET_PATH, request.getServletPath());
                 request.setAttribute(ASYNC_PATH_INFO, request.getPathInfo());
                 request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
-            }
-            final RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(path);
-            if (!(requestDispatcher instanceof AsyncDispatcher applicationDispatcher)) {
-                throw new UnsupportedOperationException(sm.getString("asyncContextImpl.noAsyncDispatcher"));
             }
             final ServletRequest servletRequest = getRequest();
             final ServletResponse servletResponse = getResponse();

@@ -279,6 +279,16 @@
         fails because the protocol in use, such as AJP or HTTP/2, does not
         support HTTP upgrade. (markt)
       </fix>
+      <fix>
+        Fix <code>AsyncContext.dispatch()</code> when the request URI contains
+        <code>..</code> segments that return to the context path, such as
+        <code>/examples/../examples/async</code>. The context path derived from
+        the request URI now includes those segments so that the remainder of
+        the URI remains within the context. The context path, decoded as per the
+        connector settings, is removed before the remaining path is processed as
+        per the context decoding settings. Also ensure that a failed
+        asynchronous dispatch does not modify the request attributes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
