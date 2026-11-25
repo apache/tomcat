@@ -351,7 +351,15 @@ public class ApplicationContext implements ServletContext {
         if (path == null) {
             return null;
         }
-        if (!path.startsWith("/")) {
+        /*
+         * The path must start with a '/'. The exception is a path from AsyncContext.dispatch(). That is a substring of
+         * the request URI and, as the connector may treat an encoded solidus (%2f) or an encoded reverse solidus (%5c)
+         * as a path separator, it may start with one. Whether such a path is valid depends on the configuration of the
+         * Context so that is checked once the path has been decoded.
+         */
+        boolean startsWithEncodedSeparator = AsyncContextImpl.uriEncoded.get().booleanValue() &&
+                (path.regionMatches(true, 0, "%2f", 0, 3) || path.regionMatches(true, 0, "%5c", 0, 3));
+        if (!path.startsWith("/") && !startsWithEncodedSeparator) {
             throw new IllegalArgumentException(sm.getString("applicationContext.requestDispatcher.iae", path));
         }
 
@@ -379,6 +387,12 @@ public class ApplicationContext implements ServletContext {
         if (pathIsEncoded) {
             uriToMap = UDecoder.URLDecode(uriToMap, StandardCharsets.UTF_8, context.getEncodedSolidusHandlingEnum(),
                     context.getEncodedReverseSolidusHandlingEnum());
+        }
+
+        if (startsWithEncodedSeparator && !uriToMap.startsWith("/") && !uriToMap.startsWith("\\")) {
+            // The encoded separator at the start of the path was not decoded (it is being passed through) so the path
+            // does not start with a '/'
+            throw new IllegalArgumentException(sm.getString("applicationContext.requestDispatcher.iae", path));
         }
 
         // Then normalize
