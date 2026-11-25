@@ -744,6 +744,140 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
         }
     }
 
+    /*
+     * A bare CR in the chunk header line must be rejected regardless of whether available() has been called to
+     * pre-parse the chunk header.
+     */
+    @Test
+    public void testChunkHeaderBareCrBareLf() throws Exception {
+        doTestChunkHeaderBareCr("2\r5\n", false);
+    }
+
+    @Test
+    public void testChunkHeaderBareCrBareLfAvailable() throws Exception {
+        doTestChunkHeaderBareCr("2\r5\n", true);
+    }
+
+    @Test
+    public void testChunkHeaderExtensionBareCrBareLf() throws Exception {
+        doTestChunkHeaderBareCr("2;a\r5\n", false);
+    }
+
+    @Test
+    public void testChunkHeaderExtensionBareCrBareLfAvailable() throws Exception {
+        doTestChunkHeaderBareCr("2;a\r5\n", true);
+    }
+
+    private void doTestChunkHeaderBareCr(String secondChunkHeader, boolean callAvailable) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        AvailableBodyServlet servlet = new AvailableBodyServlet(callAvailable);
+        Tomcat.addServlet(ctx, "servlet", servlet);
+        ctx.addServletMapping("/", "servlet");
+
+        tomcat.start();
+
+        // The second chunk header is invalid. If it were accepted, the chunk size would be 0x25 (37)
+        // @formatter:off
+        String request =
+                "POST / HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                "Transfer-encoding: chunked" + CRLF +
+                "Content-Type: text/plain" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF +
+                "3" + CRLF +
+                "abc" + CRLF +
+                secondChunkHeader +
+                "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" + CRLF +
+                "0" + CRLF +
+                CRLF;
+        // @formatter:on
+
+        TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
+        client.setUseContentLength(true);
+        client.setRequest(new String[] { request });
+
+        Exception processException = null;
+        client.connect();
+        try {
+            client.processRequest();
+            client.disconnect();
+        } catch (Exception e) {
+            // Socket was probably closed before client had a chance to read response
+            processException = e;
+        }
+
+        if (processException == null) {
+            Assert.assertTrue(client.getResponseLine(), client.isResponse400());
+        }
+        Assert.assertTrue("Invalid chunk header was accepted", servlet.getExceptionDuringRead());
+        Assert.assertEquals("Data from the invalid chunk was read", 3, servlet.getCountRead());
+    }
+
+
+    private static class AvailableBodyServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
+        private final boolean callAvailable;
+        private volatile boolean exceptionDuringRead = false;
+        private volatile int countRead = 0;
+
+        AvailableBodyServlet(boolean callAvailable) {
+            this.callAvailable = callAvailable;
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+
+            InputStream is = req.getInputStream();
+            try {
+                // Read exactly the first chunk so the next read starts at the second chunk header
+                byte[] first = new byte[3];
+                int read = 0;
+                while (read < first.length) {
+                    int n = is.read(first, read, first.length - read);
+                    if (n < 0) {
+                        break;
+                    }
+                    read += n;
+                }
+                countRead = read;
+
+                if (callAvailable) {
+                    // Triggers pre-parsing of the next chunk header
+                    is.available();
+                }
+
+                byte[] buf = new byte[64];
+                int n;
+                while ((n = is.read(buf)) > 0) {
+                    countRead += n;
+                }
+            } catch (IOException ioe) {
+                exceptionDuringRead = true;
+                if (!resp.isCommitted()) {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                }
+                return;
+            }
+            resp.getWriter().write(Integer.toString(countRead));
+        }
+
+        public boolean getExceptionDuringRead() {
+            return exceptionDuringRead;
+        }
+
+        public int getCountRead() {
+            return countRead;
+        }
+    }
+
+
     private static class BodyReadServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
 
