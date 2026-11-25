@@ -73,6 +73,8 @@ public abstract class WsFrameBase {
     // consistently for the entire message
     private MessageHandler binaryMsgHandler = null;
     private MessageHandler textMsgHandler = null;
+    // Allocated on first use. Receives the output of the transformation for messages that are discarded
+    private ByteBuffer discardBuffer = null;
 
     // Attributes of the current frame
     private boolean fin = false;
@@ -683,20 +685,34 @@ public abstract class WsFrameBase {
     }
 
 
-    private boolean swallowInput() {
-        long toSkip = Math.min(payloadLength - payloadWritten, inputBuffer.remaining());
-        inputBuffer.position(inputBuffer.position() + (int) toSkip);
-        payloadWritten += toSkip;
-        if (payloadWritten == payloadLength) {
-            if (continuationExpected) {
-                newFrame();
-            } else {
-                newMessage();
-            }
-            return true;
-        } else {
-            return false;
+    /**
+     * Discards the message data when there is no message handler for the message type. The data is still passed through
+     * the transformation so that any state it maintains, such as the LZ77 window used by permessage-deflate when
+     * context takeover is in use, remains in step with the sender.
+     */
+    private boolean swallowInput() throws IOException {
+        if (discardBuffer == null) {
+            discardBuffer = ByteBuffer.allocate(Constants.DEFAULT_BUFFER_SIZE);
         }
+        discardBuffer.clear();
+        TransformationResult tr = transformation.getMoreData(opCode, fin, rsv, discardBuffer);
+        while (!TransformationResult.END_OF_FRAME.equals(tr)) {
+            if (TransformationResult.UNDERFLOW.equals(tr)) {
+                // Ran out of input data - get some more
+                return false;
+            }
+            // Ran out of space in the buffer - discard what has been transformed so far
+            discardBuffer.clear();
+            tr = transformation.getMoreData(opCode, fin, rsv, discardBuffer);
+        }
+        discardBuffer.clear();
+
+        if (continuationExpected) {
+            newFrame();
+        } else {
+            newMessage();
+        }
+        return true;
     }
 
 
