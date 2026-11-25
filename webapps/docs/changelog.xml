@@ -148,6 +148,12 @@
         Make handling of <code>allowSpecialPaths</code> within the WebDAV
         servlet consistent for all WebDAV methods. (markt)
       </fix>
+      <fix>
+        When the rewrite valve reaches the limit on the number of rounds
+        triggered by the <code>[N]</code> (next) flag, reject the request with a
+        500 response rather than processing it using a URL that the remaining
+        rewrite rules have not been applied to. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
