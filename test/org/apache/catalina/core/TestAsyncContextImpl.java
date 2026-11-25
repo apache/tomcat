@@ -2866,6 +2866,76 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
 
     /*
+     * AsyncListener.onError() is application code so must be called using the web application's class loader when an
+     * asynchronous dispatch fails.
+     */
+    @Test
+    public void testAsyncDispatchFailureListenerClassLoader() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("/test", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) context.getJarScanner()).setScanClassPath(false);
+
+        AtomicReference<ClassLoader> webappClassLoader = new AtomicReference<>();
+        AtomicReference<ClassLoader> listenerClassLoader = new AtomicReference<>();
+        CountDownLatch completed = new CountDownLatch(1);
+
+        Wrapper start = Tomcat.addServlet(context, "start", new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+                webappClassLoader.set(Thread.currentThread().getContextClassLoader());
+                AsyncContext ac = req.startAsync();
+                ac.addListener(new AsyncListener() {
+                    @Override
+                    public void onComplete(AsyncEvent event) {
+                        completed.countDown();
+                    }
+
+                    @Override
+                    public void onTimeout(AsyncEvent event) {
+                        // NO-OP
+                    }
+
+                    @Override
+                    public void onError(AsyncEvent event) {
+                        listenerClassLoader.set(Thread.currentThread().getContextClassLoader());
+                    }
+
+                    @Override
+                    public void onStartAsync(AsyncEvent event) {
+                        // NO-OP
+                    }
+                });
+                ac.dispatch("/failing");
+            }
+        });
+        start.setAsyncSupported(true);
+        context.addServletMapping("/start", "start");
+
+        Wrapper failing = Tomcat.addServlet(context, "failing", new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException {
+                throw new ServletException("Expected");
+            }
+        });
+        failing.setAsyncSupported(true);
+        context.addServletMapping("/failing", "failing");
+        tomcat.start();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/start", new ByteChunk(), null);
+
+        Assert.assertEquals(500, rc);
+        Assert.assertTrue("onComplete() must be called", completed.await(5, TimeUnit.SECONDS));
+        Assert.assertNotNull(listenerClassLoader.get());
+        Assert.assertSame(webappClassLoader.get(), listenerClassLoader.get());
+    }
+
+
+    /*
      * A failed dispatch must not change the state of the request. The application must be able to recover from the
      * failure. In particular, the async attributes that record the original request must not have been set by the
      * failed attempt.

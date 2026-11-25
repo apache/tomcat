@@ -580,14 +580,23 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
             AsyncEvent errorEvent =
                     new AsyncEvent(event.getAsyncContext(), event.getSuppliedRequest(), event.getSuppliedResponse(), t);
             List<AsyncListenerWrapper> listenersCopy = new ArrayList<>(listeners);
-            for (AsyncListenerWrapper listener : listenersCopy) {
-                try {
-                    listener.fireOnError(errorEvent);
-                } catch (Throwable t2) {
-                    ExceptionUtils.handleThrowable(t2);
-                    log.warn(sm.getString("asyncContextImpl.onErrorError", listener.getClass().getName()), t2);
-                } finally {
-                    hasOnErrorReturned.set(true);
+            // The listeners are application code so need the application's context. Not all callers have bound it.
+            Context context = this.context;
+            ClassLoader oldCL = context == null ? null : context.bind(null);
+            try {
+                for (AsyncListenerWrapper listener : listenersCopy) {
+                    try {
+                        listener.fireOnError(errorEvent);
+                    } catch (Throwable t2) {
+                        ExceptionUtils.handleThrowable(t2);
+                        log.warn(sm.getString("asyncContextImpl.onErrorError", listener.getClass().getName()), t2);
+                    } finally {
+                        hasOnErrorReturned.set(true);
+                    }
+                }
+            } finally {
+                if (context != null) {
+                    context.unbind(oldCL);
                 }
             }
         }
