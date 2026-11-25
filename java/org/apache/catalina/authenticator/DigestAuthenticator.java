@@ -470,7 +470,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean isPreemptiveAuthPossible(Request request) {
         MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
-        return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("digest ", 0);
+        if (authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("digest ", 0)) {
+            return true;
+        }
+        return isPreemptiveAuthRequired(request);
     }
 
 

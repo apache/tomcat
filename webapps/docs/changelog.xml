@@ -241,6 +241,17 @@
         Expand the user name normalisation options available in the
         <code>LockOutRealm</code>. (markt)
       </fix>
+      <fix>
+        Harden the <code>RequestFilterValve</code>. If
+        <code>invalidAuthenticationWhenDeny</code> is configured and allows a
+        request through to be authenticated but the authenticator that processes
+        the request does not support preemptive authentication, then the request
+        is denied. (markt)
+      </fix>
+      <fix>
+        Make handling of <code>allowSpecialPaths</code> within the WebDAV
+        servlet consistent for all WebDAV methods. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -383,6 +394,12 @@
         Ensure that the non-blocking write buffer is empty before sending an AJP
         get body chunk message or flush message so that the messages cannot be
         written part way through a response body message. (markt)
+      </fix>
+      <fix>
+        Fix the AJP connector so that it closes the connection, rather than
+        reading further messages, once a request has ended in error.
+        Previously, a body packet that had not been read could be processed as
+        the start of a new AJP request. (markt)
       </fix>
     </changelog>
   </subsection>
