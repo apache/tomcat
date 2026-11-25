@@ -154,6 +154,27 @@
         500 response rather than processing it using a URL that the remaining
         rewrite rules have not been applied to. (markt)
       </fix>
+      <update>
+        Allow <code>HttpServletRequest.upgrade()</code> to be called after
+        <code>startAsync()</code> provided it is called before
+        <code>AsyncContext.complete()</code> or
+        <code>AsyncContext.dispatch()</code> and before an asynchronous error
+        has occurred. The upgrade takes place when the
+        asynchronous processing completes, regardless of whether keep-alive is
+        enabled for the request. (markt)
+      </update>
+      <fix>
+        Ensure that <code>HttpServletRequest.upgrade()</code> can only be called
+        once per request. A second call previously created a second
+        <code>HttpUpgradeHandler</code> instance that was never destroyed.
+        (markt)
+      </fix>
+      <fix>
+        Ensure that the <code>HttpUpgradeHandler</code> instance created by
+        <code>HttpServletRequest.upgrade()</code> is destroyed if the upgrade
+        fails because the protocol in use, such as AJP or HTTP/2, does not
+        support HTTP upgrade. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -288,6 +309,26 @@
         response were recycled, and returned to the pool for re-use, while the
         application still owned them. The stream is now closed once asynchronous
         processing ends. (markt)
+      </fix>
+      <fix>
+        Do not add a <code>Connection: close</code> header to an HTTP
+        <code>101</code> (switching protocols) response when keep-alive has been
+        disabled for the request. The header contradicted the
+        <code>Connection: upgrade</code> header required by the protocol being
+        switched to and could cause the client to reject the upgrade. (markt)
+      </fix>
+      <fix>
+        Ensure that the <code>HttpUpgradeHandler</code> instance is destroyed,
+        and that the processor that handled the HTTP request is not released
+        twice, if a failure occurs after the HTTP request has been processed but
+        before the upgrade processor has taken ownership of the handler. (markt)
+      </fix>
+      <fix>
+        Ensure that an exception thrown by
+        <code>HttpUpgradeHandler.destroy()</code> does not prevent the
+        connection and its processor from being cleaned up. Also ensure that
+        <code>destroy()</code> is only called if <code>init()</code> was called
+        for the handler. (markt)
       </fix>
     </changelog>
   </subsection>
