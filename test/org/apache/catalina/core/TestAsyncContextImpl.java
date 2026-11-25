@@ -19,6 +19,8 @@ package org.apache.catalina.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +31,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 
@@ -39,6 +43,7 @@ import javax.servlet.DispatcherType;
 import javax.servlet.GenericServlet;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
@@ -50,6 +55,7 @@ import javax.servlet.ServletResponseWrapper;
 import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
@@ -2588,6 +2594,286 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
     @Test
     public void testAsyncDispatchEncodedDotSegmentsAfterContextPath() throws Exception {
         doTestAsyncDispatchPath("/test/%2e%2e/test/semicolon/foo", "/foo|/foo");
+    }
+
+
+    /*
+     * The path for the dispatch in AsyncContext.dispatch() is derived by the container so, if it can't be used, the
+     * application can't be expected to recover. If the caller is not the container thread that is processing the
+     * request there is nothing to handle the exception so the container must complete the request rather than leave
+     * it waiting for the async timeout (which could be infinite).
+     */
+    @Test
+    public void testAsyncDispatchNoArgFailureNonContainerThread() throws Exception {
+        AsyncDispatchNoArgFailureServlet servlet = new AsyncDispatchNoArgFailureServlet(false);
+        long elapsed = doTestAsyncDispatchNoArgFailure(servlet);
+
+        // The async timeout is 10s
+        Assert.assertTrue("Request waited for the async timeout: " + elapsed + "ms", elapsed < 5000);
+        Assert.assertTrue("The caller must be told about the failure", servlet.callerException.get() instanceof
+                UnsupportedOperationException);
+        // The failure is handled like any other failure of an async dispatch so may be wrapped
+        Throwable listenerThrowable = servlet.listenerThrowable.get();
+        while (listenerThrowable != null && !(listenerThrowable instanceof UnsupportedOperationException)) {
+            listenerThrowable = listenerThrowable.getCause();
+        }
+        Assert.assertNotNull("onError() must be called with the failure", listenerThrowable);
+        Assert.assertTrue("onComplete() must be called", servlet.completed.await(5, TimeUnit.SECONDS));
+    }
+
+
+    /*
+     * As above but the caller is the container thread that is processing the request so the exception propagates out
+     * of the application and is handled in the usual way.
+     */
+    @Test
+    public void testAsyncDispatchNoArgFailureContainerThread() throws Exception {
+        AsyncDispatchNoArgFailureServlet servlet = new AsyncDispatchNoArgFailureServlet(true);
+        long elapsed = doTestAsyncDispatchNoArgFailure(servlet);
+
+        Assert.assertTrue("Request waited for the async timeout: " + elapsed + "ms", elapsed < 5000);
+        Assert.assertTrue("onComplete() must be called", servlet.completed.await(5, TimeUnit.SECONDS));
+    }
+
+
+    /*
+     * The failure is handled in the same way as any other failure so a mapped error page for the exception must be
+     * used.
+     */
+    @Test
+    public void testAsyncDispatchNoArgFailureNonContainerThreadErrorPage() throws Exception {
+        AsyncDispatchNoArgFailureServlet servlet = new AsyncDispatchNoArgFailureServlet(false);
+        ByteChunk responseBody = new ByteChunk();
+        long elapsed = doTestAsyncDispatchNoArgFailure(servlet, context -> {
+            Tomcat.addServlet(context, "errorPage", new HttpServlet() {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                    resp.setContentType("text/plain");
+                    resp.getWriter().print("ERROR-PAGE:" +
+                            ((Class<?>) req.getAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE)).getName());
+                }
+            });
+            context.addServletMapping("/errorPage", "errorPage");
+            ErrorPage errorPage = new ErrorPage();
+            errorPage.setExceptionType(UnsupportedOperationException.class.getName());
+            errorPage.setLocation("/errorPage");
+            context.addErrorPage(errorPage);
+        }, responseBody);
+
+        Assert.assertTrue("Request waited for the async timeout: " + elapsed + "ms", elapsed < 5000);
+        Assert.assertEquals("ERROR-PAGE:" + UnsupportedOperationException.class.getName(),
+                responseBody.toString());
+    }
+
+
+    /*
+     * Each listener must be able to use the AsyncContext to recover from the failure, not just the first.
+     */
+    @Test
+    public void testAsyncDispatchNoArgFailureNonContainerThreadSecondListenerCompletes() throws Exception {
+        AsyncDispatchNoArgFailureServlet servlet = new AsyncDispatchNoArgFailureServlet(false);
+        servlet.secondListenerCompletes = true;
+        ByteChunk responseBody = new ByteChunk();
+        long elapsed = doTestAsyncDispatchNoArgFailure(servlet, null, responseBody);
+
+        Assert.assertTrue("Request waited for the async timeout: " + elapsed + "ms", elapsed < 5000);
+        Assert.assertNull("The second listener must be able to use the AsyncContext",
+                servlet.secondListenerException.get());
+        Assert.assertTrue("onComplete() must be called", servlet.completed.await(5, TimeUnit.SECONDS));
+    }
+
+
+    /*
+     * The failure is handled like the failure of any other asynchronous dispatch so an error page must be able to start
+     * asynchronous processing.
+     */
+    @Test
+    public void testAsyncDispatchNoArgFailureNonContainerThreadErrorPageStartsAsync() throws Exception {
+        AsyncDispatchNoArgFailureServlet servlet = new AsyncDispatchNoArgFailureServlet(false);
+        AtomicReference<Throwable> errorPageException = new AtomicReference<>();
+        ByteChunk responseBody = new ByteChunk();
+        long elapsed = doTestAsyncDispatchNoArgFailure(servlet, context -> {
+            Wrapper w = Tomcat.addServlet(context, "errorPage", new HttpServlet() {
+                private static final long serialVersionUID = 1L;
+
+                @Override
+                protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                    try {
+                        AsyncContext ac = req.startAsync();
+                        resp.setContentType("text/plain");
+                        resp.getWriter().print("ERROR-PAGE-ASYNC");
+                        ac.complete();
+                    } catch (RuntimeException e) {
+                        errorPageException.set(e);
+                    }
+                }
+            });
+            w.setAsyncSupported(true);
+            context.addServletMapping("/errorPage", "errorPage");
+            ErrorPage errorPage = new ErrorPage();
+            errorPage.setExceptionType(UnsupportedOperationException.class.getName());
+            errorPage.setLocation("/errorPage");
+            context.addErrorPage(errorPage);
+        }, responseBody, 500);
+
+        Assert.assertTrue("Request waited for the async timeout: " + elapsed + "ms", elapsed < 5000);
+        Assert.assertNull("The error page must be able to start async processing", errorPageException.get());
+        Assert.assertEquals("ERROR-PAGE-ASYNC", responseBody.toString());
+    }
+
+
+    private long doTestAsyncDispatchNoArgFailure(AsyncDispatchNoArgFailureServlet servlet) throws Exception {
+        return doTestAsyncDispatchNoArgFailure(servlet, null, new ByteChunk());
+    }
+
+
+    private long doTestAsyncDispatchNoArgFailure(AsyncDispatchNoArgFailureServlet servlet,
+            Consumer<Context> contextConfig, ByteChunk responseBody) throws Exception {
+        return doTestAsyncDispatchNoArgFailure(servlet, contextConfig, responseBody, 500);
+    }
+
+
+    private long doTestAsyncDispatchNoArgFailure(AsyncDispatchNoArgFailureServlet servlet,
+            Consumer<Context> contextConfig, ByteChunk responseBody, int expectedStatus) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context context = tomcat.addContext("/test", null);
+        // Disable class path scanning - it slows the tests down by almost an order of magnitude
+        ((StandardJarScanner) context.getJarScanner()).setScanClassPath(false);
+
+        Wrapper w = Tomcat.addServlet(context, "failure", servlet);
+        w.setAsyncSupported(true);
+        context.addServletMapping("/failure", "failure");
+        if (contextConfig != null) {
+            contextConfig.accept(context);
+        }
+        tomcat.start();
+
+        long start = System.nanoTime();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/failure", responseBody, null);
+        long elapsed = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+
+        Assert.assertEquals(responseBody.toString(), expectedStatus, rc);
+        return elapsed;
+    }
+
+
+    /*
+     * Starts async processing with a request that provides a ServletContext that can't provide a dispatcher that
+     * supports async dispatching. This simulates a failure in the container.
+     */
+    private static class AsyncDispatchNoArgFailureServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean containerThread;
+        private boolean secondListenerCompletes = false;
+        private final transient AtomicReference<Throwable> callerException = new AtomicReference<>();
+        private final transient AtomicReference<Throwable> listenerThrowable = new AtomicReference<>();
+        private final transient AtomicReference<Throwable> secondListenerException = new AtomicReference<>();
+        private final transient CountDownLatch completed = new CountDownLatch(1);
+
+        AsyncDispatchNoArgFailureServlet(boolean containerThread) {
+            this.containerThread = containerThread;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            ServletContext realContext = req.getServletContext();
+            ServletContext brokenContext = (ServletContext) Proxy.newProxyInstance(
+                    getClass().getClassLoader(), new Class<?>[] { ServletContext.class }, (proxy, method, args) -> {
+                        if ("getRequestDispatcher".equals(method.getName())) {
+                            // Not an AsyncDispatcher
+                            return new RequestDispatcher() {
+                                @Override
+                                public void forward(ServletRequest request, ServletResponse response) {
+                                    // NO-OP
+                                }
+
+                                @Override
+                                public void include(ServletRequest request, ServletResponse response) {
+                                    // NO-OP
+                                }
+                            };
+                        }
+                        try {
+                            return method.invoke(realContext, args);
+                        } catch (InvocationTargetException e) {
+                            throw e.getCause();
+                        }
+                    });
+            HttpServletRequest brokenRequest = new HttpServletRequestWrapper(req) {
+                @Override
+                public ServletContext getServletContext() {
+                    return brokenContext;
+                }
+            };
+
+            AsyncContext ac = req.startAsync(brokenRequest, resp);
+            // Long enough that the test fails if the request is left to time out
+            ac.setTimeout(10000);
+            ac.addListener(new AsyncListener() {
+                @Override
+                public void onComplete(AsyncEvent event) {
+                    completed.countDown();
+                }
+
+                @Override
+                public void onTimeout(AsyncEvent event) {
+                    // NO-OP
+                }
+
+                @Override
+                public void onError(AsyncEvent event) {
+                    listenerThrowable.set(event.getThrowable());
+                }
+
+                @Override
+                public void onStartAsync(AsyncEvent event) {
+                    // NO-OP
+                }
+            });
+            if (secondListenerCompletes) {
+                ac.addListener(new AsyncListener() {
+                    @Override
+                    public void onComplete(AsyncEvent event) {
+                        // NO-OP
+                    }
+
+                    @Override
+                    public void onTimeout(AsyncEvent event) {
+                        // NO-OP
+                    }
+
+                    @Override
+                    public void onError(AsyncEvent event) {
+                        try {
+                            event.getAsyncContext().complete();
+                        } catch (RuntimeException e) {
+                            secondListenerException.set(e);
+                        }
+                    }
+
+                    @Override
+                    public void onStartAsync(AsyncEvent event) {
+                        // NO-OP
+                    }
+                });
+            }
+
+            if (containerThread) {
+                ac.dispatch();
+            } else {
+                new Thread(() -> {
+                    try {
+                        ac.dispatch();
+                    } catch (RuntimeException e) {
+                        callerException.set(e);
+                    }
+                }).start();
+            }
+        }
     }
 
 
