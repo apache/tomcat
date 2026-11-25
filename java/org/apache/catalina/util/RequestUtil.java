@@ -36,6 +36,9 @@ public final class RequestUtil {
 
     private static final StringManager sm = StringManager.getManager(RequestUtil.class);
 
+    // Marker for 'no candidate has matched the context path yet'. -1 is used to represent the end of the URI.
+    private static final int NO_MATCH = -2;
+
     /**
      * Default constructor.
      */
@@ -221,6 +224,7 @@ public final class RequestUtil {
         String canonicalContextPath = request.getServletContext().getContextPath();
         Connector connector = request.getConnector();
         EncodedSolidusHandling encodedSolidusHandling = connector.getEncodedSolidusHandlingInternal();
+        EncodedSolidusHandling encodedReverseSolidusHandling = connector.getEncodedReverseSolidusHandlingInternal();
 
         int pos = 0;
         if (!context.getAllowMultipleLeadingForwardSlashInPath()) {
@@ -237,49 +241,89 @@ public final class RequestUtil {
         char[] uriChars = uri.toCharArray();
         // Need at least the number of slashes in the context path
         while (lastSlash > 0) {
-            pos = nextSlash(uriChars, pos + 1, encodedSolidusHandling);
+            pos = nextSlash(uriChars, pos + 1, encodedSolidusHandling, encodedReverseSolidusHandling);
             if (pos == -1) {
                 break;
             }
             lastSlash--;
         }
-        // Now allow for path parameters, normalization and/or encoding.
-        // Essentially, keep extending the candidate path up to the next slash
-        // until the decoded and normalized candidate path (with the path
-        // parameters removed) is the same as the canonical path.
-        String candidate;
-        if (pos == -1) {
-            candidate = uri;
-        } else {
-            candidate = uri.substring(0, pos);
-        }
-        candidate = removePathParameters(candidate);
-        candidate = UDecoder.URLDecode(candidate, connector.getURICharset());
-        candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
-        boolean match = canonicalContextPath.equals(candidate);
-        while (!match && pos != -1) {
-            pos = nextSlash(uriChars, pos + 1, encodedSolidusHandling);
-            if (pos == -1) {
-                candidate = uri;
-            } else {
-                candidate = uri.substring(0, pos);
-            }
+        /*
+         * Now allow for path parameters, normalization and/or encoding. Essentially, keep extending the candidate path
+         * up to the next slash until the decoded and normalized candidate path (with the path parameters removed) is
+         * the same as the canonical path.
+         *
+         * There may be more than one candidate that matches. For example, /examples/../examples matches the context
+         * path /examples as does /examples. If the remainder of the URI after the first candidate climbs out of the
+         * context (e.g. /../examples/foo or /a/b/../../../examples/foo) then the context path in the URI must be
+         * longer. Keep going until a candidate that matches is followed by a remainder that stays within the
+         * context. If there isn't one, fall back to the first match, which is what was returned before the remainder
+         * was considered. That should only be possible for a URI that the connector would not have mapped to this
+         * context in which case no candidate can be used for a dispatch.
+         */
+        int firstMatchPos = NO_MATCH;
+        while (true) {
+            String candidate = pos == -1 ? uri : uri.substring(0, pos);
             candidate = removePathParameters(candidate);
-            candidate = UDecoder.URLDecode(candidate, connector.getURICharset());
-            candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
-            match = canonicalContextPath.equals(candidate);
-        }
-        if (match) {
-            if (pos == -1) {
-                return uri;
-            } else {
-                return uri.substring(0, pos);
+            try {
+                candidate = decode(candidate, connector);
+                candidate = org.apache.tomcat.util.http.RequestUtil.normalize(candidate);
+            } catch (IllegalArgumentException iae) {
+                // Invalid or rejected encoding. This candidate can't match.
+                candidate = null;
             }
-        } else {
-            // Should never happen
-            throw new IllegalStateException(
-                    sm.getString("requestUtil.getContextPath.ise", canonicalContextPath, uri));
+            if (canonicalContextPath.equals(candidate)) {
+                if (firstMatchPos == NO_MATCH) {
+                    firstMatchPos = pos;
+                }
+                if (pos == -1 || isRemainderWithinContext(uri.substring(pos), connector)) {
+                    return pos == -1 ? uri : uri.substring(0, pos);
+                }
+            }
+            if (pos == -1) {
+                break;
+            }
+            pos = nextSlash(uriChars, pos + 1, encodedSolidusHandling, encodedReverseSolidusHandling);
         }
+
+        if (firstMatchPos != NO_MATCH) {
+            return firstMatchPos == -1 ? uri : uri.substring(0, firstMatchPos);
+        }
+
+        // Should never happen
+        throw new IllegalStateException(sm.getString("requestUtil.getContextPath.ise", canonicalContextPath, uri));
+    }
+
+
+    /**
+     * Does the remainder of the URI, after the context path, stay within the context once path parameters have been
+     * removed, it has been decoded and normalized? This is the same processing that is applied to the path of a
+     * dispatch so a remainder that fails this test could not be used for one. The decoding must follow the connector's
+     * configuration for encoded solidus and reverse solidus. If, for example, they are passed through, an encoded
+     * solidus is part of a path segment and not a separator so it can not be part of a '..' that leaves the context.
+     */
+    private static boolean isRemainderWithinContext(String remainder, Connector connector) {
+        String path = removePathParameters(remainder);
+        try {
+            path = decode(path, connector);
+        } catch (IllegalArgumentException iae) {
+            /*
+             * Invalid or, more likely, rejected encoding. A request with such a URI would have been rejected before
+             * it was processed. Don't look for a longer context path.
+             */
+            return true;
+        }
+        return org.apache.tomcat.util.http.RequestUtil.normalize(path) != null;
+    }
+
+
+    /**
+     * Decode part of a request URI using the connector's configuration for encoded solidus and reverse solidus. These
+     * must be handled in the same way as when the connector processed the request URI. If, for example, they are
+     * passed through, an encoded solidus is part of a path segment and not a separator.
+     */
+    private static String decode(String input, Connector connector) {
+        return UDecoder.URLDecode(input, connector.getURICharset(), connector.getEncodedSolidusHandlingInternal(),
+                connector.getEncodedReverseSolidusHandlingInternal());
     }
 
 
@@ -309,16 +353,32 @@ public final class RequestUtil {
     }
 
 
-    private static int nextSlash(char[] uri, int startPos, EncodedSolidusHandling encodedSolidusHandling) {
+    private static int nextSlash(char[] uri, int startPos, EncodedSolidusHandling encodedSolidusHandling,
+            EncodedSolidusHandling encodedReverseSolidusHandling) {
         int len = uri.length;
         int pos = startPos;
         while (pos < len) {
             if (uri[pos] == '/') {
                 return pos;
-            } else if (encodedSolidusHandling == EncodedSolidusHandling.DECODE &&
-                    uri[pos] == '%' && pos + 2 < len && uri[pos + 1] == '2' &&
-                    (uri[pos + 2] == 'f' || uri[pos + 2] == 'F')) {
-                return pos;
+            } else if (uri[pos] == ';') {
+                /*
+                 * Path parameters are removed before the URI is decoded so anything that looks like an encoded solidus
+                 * (or reverse solidus) within them is not a separator. Skip to the end of the path parameters which is
+                 * the next solidus.
+                 */
+                do {
+                    pos++;
+                } while (pos < len && uri[pos] != '/');
+                return pos < len ? pos : -1;
+            } else if (uri[pos] == '%' && pos + 2 < len) {
+                // An encoded solidus (or reverse solidus) is a separator if the connector decodes it
+                if (encodedSolidusHandling == EncodedSolidusHandling.DECODE && uri[pos + 1] == '2' &&
+                        (uri[pos + 2] == 'f' || uri[pos + 2] == 'F')) {
+                    return pos;
+                } else if (encodedReverseSolidusHandling == EncodedSolidusHandling.DECODE && uri[pos + 1] == '5' &&
+                        (uri[pos + 2] == 'c' || uri[pos + 2] == 'C')) {
+                    return pos;
+                }
             }
             pos++;
         }
