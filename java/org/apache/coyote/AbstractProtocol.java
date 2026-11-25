@@ -42,6 +42,7 @@ import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.WebConnection;
 
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
+import org.apache.coyote.http11.upgrade.UpgradeProcessorBase;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -1264,6 +1265,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 return SocketState.CLOSED;
             }
 
+            /*
+             * Tracks an HTTP upgrade for which the processor that was handling the HTTP request has been released but
+             * the upgrade processor that takes ownership of the HttpUpgradeHandler has not yet been created. If
+             * something goes wrong in that window there is no processor that cleanUpIfUpgrade() can use to find the
+             * handler.
+             */
+            UpgradeToken pendingUpgradeToken = null;
+
             try {
                 if (processor == null) {
                     String negotiatedProtocol = wrapper.getNegotiatedProtocol();
@@ -1333,6 +1342,8 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                             if (upgradeProtocol != null) {
                                 // Release the Http11 processor to be re-used
                                 release(processor);
+                                // Make sure the released processor is not used or released again if the next step fails
+                                processor = null;
                                 // Create the upgrade processor
                                 processor = upgradeProtocol.getProcessor(wrapper, getProtocol().getAdapter());
                             } else {
@@ -1347,8 +1358,16 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                             HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
                             // Release the Http11 processor to be re-used
                             release(processor);
+                            /*
+                             * The released processor no longer references the upgrade token. Make sure it is not used
+                             * or released again and that the handler is cleaned up if the next step fails.
+                             */
+                            processor = null;
+                            pendingUpgradeToken = upgradeToken;
                             // Create the upgrade processor
                             processor = getProtocol().createUpgradeProcessor(wrapper, upgradeToken);
+                            // The upgrade processor now owns the upgrade token
+                            pendingUpgradeToken = null;
                             if (getLog().isTraceEnabled()) {
                                 getLog().trace(
                                         sm.getString("abstractConnectionHandler.upgradeCreate", processor, wrapper));
@@ -1480,6 +1499,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             // Processors handling upgrades require additional clean-up
             // before release.
             cleanUpIfUpgrade(processor);
+            cleanUpUpgradeToken(pendingUpgradeToken, false);
             // Make sure socket/processor is removed from the list of current
             // connections
             release(processor);
@@ -1489,24 +1509,56 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
         private void cleanUpIfUpgrade(Processor processor) {
             if (processor != null && processor.isUpgrade()) {
-                UpgradeToken upgradeToken = processor.getUpgradeToken();
-                HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
-                InstanceManager instanceManager = upgradeToken.getInstanceManager();
-                if (instanceManager == null) {
-                    httpUpgradeHandler.destroy();
-                } else {
-                    ClassLoader oldCL = upgradeToken.getContextBind().bind(false, null);
+                /*
+                 * Only an upgrade processor means the upgrade has been completed and the handler initialised. If the
+                 * processor is anything else (an HTTP processor that still holds the upgrade token) the upgrade was
+                 * abandoned before the handler was initialised.
+                 */
+                cleanUpUpgradeToken(processor.getUpgradeToken(), processor instanceof UpgradeProcessorBase);
+            }
+        }
+
+
+        /**
+         * Clean up the handler for an upgrade.
+         *
+         * @param upgradeToken The upgrade token for the upgrade
+         * @param initialised  Has the handler been (or at least started to be) initialised? {@link
+         *                         HttpUpgradeHandler#destroy()} must not be called if it has not as handlers may rely
+         *                         on state set during initialisation.
+         */
+        private void cleanUpUpgradeToken(UpgradeToken upgradeToken, boolean initialised) {
+            if (upgradeToken == null) {
+                return;
+            }
+            HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+            InstanceManager instanceManager = upgradeToken.getInstanceManager();
+            ClassLoader oldCL = null;
+            if (instanceManager != null) {
+                oldCL = upgradeToken.getContextBind().bind(false, null);
+            }
+            try {
+                if (initialised) {
+                    /*
+                     * An exception here must not prevent the rest of the clean-up or the release of the processor
+                     * which is what de-registers it (and its statistics).
+                     */
                     try {
                         httpUpgradeHandler.destroy();
-                    } finally {
-                        try {
-                            instanceManager.destroyInstance(httpUpgradeHandler);
-                        } catch (Throwable t) {
-                            ExceptionUtils.handleThrowable(t);
-                            getLog().error(sm.getString("abstractConnectionHandler.error"), t);
-                        }
-                        upgradeToken.getContextBind().unbind(false, oldCL);
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        getLog().error(sm.getString("abstractConnectionHandler.upgradeDestroyFail"), t);
                     }
+                }
+            } finally {
+                if (instanceManager != null) {
+                    try {
+                        instanceManager.destroyInstance(httpUpgradeHandler);
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        getLog().error(sm.getString("abstractConnectionHandler.error"), t);
+                    }
+                    upgradeToken.getContextBind().unbind(false, oldCL);
                 }
             }
         }
