@@ -270,6 +270,10 @@
         Previously, a body packet that had not been read could be processed as
         the start of a new AJP request. (markt)
       </fix>
+      <fix>
+        Fix the parsing of chunk header lines so that a CR that has been consumed
+        is always followed by an LF. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
