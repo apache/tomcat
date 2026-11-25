@@ -516,6 +516,13 @@
         <code>Writer</code> and <code>OutputStream</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Fix the handling of compressed WebSocket messages for which there is no
+        message handler when the <code>permessage-deflate</code> extension is
+        used with context takeover. Such messages are now decompressed and
+        discarded so that later messages are decompressed using the correct
+        window. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
