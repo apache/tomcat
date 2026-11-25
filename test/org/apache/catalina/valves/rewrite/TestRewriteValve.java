@@ -303,6 +303,38 @@ public class TestRewriteValve extends TomcatBaseTest {
         // state at which rewriting stops by itself
         String config = "RewriteRule ^/c/x$ /c/y [N]\n" + "RewriteRule ^/c/y$ /c/x [N]\n";
 
+        // Rewriting must stop after a bounded number of rounds and the
+        // request must complete. It must fail closed rather than be
+        // dispatched with a URL that the remaining rules have not seen.
+        Assert.assertEquals(500, doTestNextRounds(config, "/c/x"));
+    }
+
+    private static final String NEXT_THEN_FORBIDDEN =
+            "RewriteRule ^/c/a/(.*)$ /c/$1 [N]\n" + "RewriteRule ^/c/secret$ - [F]\n";
+
+    @Test(timeout = 30000)
+    public void testRewriteRuleNextWithinBoundThenForbidden() throws Exception {
+        // The next rule converges, needing one round per path segment, and
+        // the later forbidden rule applies to the final URL
+        Assert.assertEquals(403, doTestNextRounds(NEXT_THEN_FORBIDDEN, "/c/" + repeat("a/", 10) + "secret"));
+    }
+
+    @Test(timeout = 30000)
+    public void testRewriteRuleNextBeyondBoundDoesNotBypassForbidden() throws Exception {
+        // Beyond the bound the request must not reach the servlet with a
+        // URL that the forbidden rule has not been applied to
+        Assert.assertEquals(500, doTestNextRounds(NEXT_THEN_FORBIDDEN, "/c/" + repeat("a/", 1100) + "secret"));
+    }
+
+    private static String repeat(String s, int count) {
+        StringBuilder sb = new StringBuilder(s.length() * count);
+        for (int i = 0; i < count; i++) {
+            sb.append(s);
+        }
+        return sb.toString();
+    }
+
+    private int doTestNextRounds(String config, String path) throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Context ctx = getProgrammaticRootContext();
 
@@ -316,16 +348,8 @@ public class TestRewriteValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        int rc = methodUrl("http://localhost:" + getPort() + "/c/x", res, DEFAULT_CLIENT_TIMEOUT_MS, null, null,
+        return methodUrl("http://localhost:" + getPort() + path, res, DEFAULT_CLIENT_TIMEOUT_MS, null, null,
                 Method.GET, true);
-        res.setCharset(StandardCharsets.UTF_8);
-
-        // Rewriting must stop after a bounded number of rounds and the
-        // request must complete, mapped to the servlet thanks to the last
-        // rewrite that was applied
-        Assert.assertEquals(200, rc);
-        String requestURI = SnoopResult.parse(res.toString()).getRequestInfo("REQUEST-URI");
-        Assert.assertTrue(requestURI, "/c/x".equals(requestURI) || "/c/y".equals(requestURI));
     }
 
     @Test
