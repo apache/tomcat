@@ -192,6 +192,11 @@
         error. Fire <code>AsyncListener.onError()</code>, generate the error
         response and complete the request. (markt)
       </fix>
+      <fix>
+        Ensure that the web application's class loader and naming context are
+        bound when <code>AsyncListener.onError()</code> is called for a failed
+        asynchronous dispatch. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
