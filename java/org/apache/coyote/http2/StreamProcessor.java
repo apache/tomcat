@@ -521,6 +521,15 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
 
         if (sendfileState == SendfileState.PENDING) {
             return SocketState.SENDFILE;
+        } else if (isAsync() && getErrorState().isIoAllowed()) {
+            /*
+             * The error state (e.g. CLOSE_CLEAN after an aborted upload) still permits I/O and the application has
+             * started asynchronous processing so it still owns the request and response. Closing the stream now would
+             * recycle them, and return them to the pool for re-use, while the application is still using them. Remain
+             * in asynchronous mode. The stream is closed, with the unread request body cancelled, once asynchronous
+             * processing ends.
+             */
+            return SocketState.LONG;
         } else if (getErrorState().isError()) {
             action(ActionCode.CLOSE, null);
             request.updateCounters();
