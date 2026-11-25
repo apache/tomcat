@@ -320,6 +320,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Fix the handling of compressed WebSocket messages for which there is no
+        message handler when the <code>permessage-deflate</code> extension is
+        used with context takeover. Such messages are now decompressed and
+        discarded so that later messages are decompressed using the correct
+        window. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <docs>
