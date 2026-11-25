@@ -806,6 +806,7 @@ public class ConnectionPool {
      *
      * @param force {@code true} to close the active connections as well
      */
+    @SuppressWarnings("null")
     protected void close(boolean force) {
         // Claim the closure atomically. Two callers that observe the open state
         // at the same time would otherwise both run the drain and deliver the
@@ -880,6 +881,7 @@ public class ConnectionPool {
         PoolProperties.InterceptorDefinition[] toldStarted = closingDuringInit && started != null
                 ? Arrays.copyOf(started, startedLimit) : started;
         synchronized (interceptorStartLock) {
+            // No NPE. If started is null, startedLimit will be zero.
             for (int i = 0; i < startedLimit; i++) {
                 informInterceptorOfPoolClosure(started[i]);
             }

@@ -113,7 +113,7 @@ abstract class ClosedPoolBorrowConnectBase extends JdbcPoolBaseTest {
 
             AtomicReference<Throwable> failure = new AtomicReference<>();
             Thread borrower = new Thread(() -> {
-                try (Connection pooled = pool.getConnection()) {
+                try (@SuppressWarnings("unused") Connection pooled = pool.getConnection()) {
                     Assertions.fail("a closed pool must not hand out a connection");
                 } catch (SQLException x) {
                     failure.set(x);
