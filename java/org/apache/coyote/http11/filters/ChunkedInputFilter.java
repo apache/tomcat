@@ -368,6 +368,17 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
         boolean eol = false;
 
+        if (crFound) {
+            /*
+             * The CR at the end of the chunk header line has already been consumed. Only the LF may follow. Don't
+             * resume parsing the chunk size or extension.
+             */
+            if (!parseCRLF()) {
+                return false;
+            }
+            eol = true;
+        }
+
         while (!eol) {
             if (!fill()) {
                 return false;
@@ -445,6 +456,17 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     private boolean skipChunkHeader() {
 
         boolean eol = false;
+
+        if (crFound) {
+            /*
+             * The CR at the end of the chunk header line has already been consumed. Only the LF may follow. Don't
+             * resume parsing the chunk size or extension.
+             */
+            if (!skipCRLF()) {
+                return false;
+            }
+            eol = true;
+        }
 
         while (!eol) {
             if (readChunk == null || readChunk.position() >= readChunk.limit()) {
