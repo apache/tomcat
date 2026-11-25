@@ -185,6 +185,13 @@
         per the context decoding settings. Also ensure that a failed
         asynchronous dispatch does not modify the request attributes. (markt)
       </fix>
+      <fix>
+        If <code>AsyncContext.dispatch()</code> is unable to dispatch the
+        request, for example because of a bug, and it is not called by the
+        container thread processing the request then treat the failure as an
+        error. Fire <code>AsyncListener.onError()</code>, generate the error
+        response and complete the request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
