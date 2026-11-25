@@ -223,7 +223,13 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         // Calls check() so local copies are validated
         HttpServletRequest hsr = getRequest() instanceof HttpServletRequest h ? h : request;
         String path = hsr.getRequestURI();
-        String cpath = RequestUtil.getContextPathEncoded(request.getConnector(), hsr);
+        String cpath;
+        try {
+            cpath = RequestUtil.getContextPathEncoded(request.getConnector(), hsr);
+        } catch (IllegalStateException ise) {
+            failDispatch(ise);
+            throw ise;
+        }
         if (cpath.length() > 1) {
             path = path.substring(cpath.length());
         }
@@ -235,8 +241,44 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         try {
             uriEncoded.set(Boolean.TRUE);
             dispatch(path);
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
+            failDispatch(e);
+            throw e;
         } finally {
             uriEncoded.set(Boolean.FALSE);
+        }
+    }
+
+
+    /**
+     * Called when {@link #dispatch()} fails because the dispatch path, that was derived by the container, could not be
+     * used. The application can't be expected to recover from this.
+     * <p>
+     * If the caller is the container thread that is processing the request, the exception propagates out of the
+     * application and is handled by the container. In any other case nothing would handle the exception on behalf of
+     * the container and the request would remain in the asynchronous state until the asynchronous timeout expired
+     * (which might be never). Dispatch to a container thread, as for a normal dispatch, but rather than dispatching
+     * the request, throw the exception so that it is handled in the same way as any other failure of an asynchronous
+     * dispatch.
+     *
+     * @param t The reason the dispatch failed
+     */
+    private void failDispatch(RuntimeException t) {
+        if (request.getCoyoteRequest().isRequestThread()) {
+            return;
+        }
+        synchronized (asyncContextLock) {
+            if (dispatch != null) {
+                // A dispatch has already been requested
+                return;
+            }
+            // Runs on a container thread where the failure is handled like any other failure of an async dispatch
+            dispatch = () -> {
+                // As for a normal dispatch, the dispatch is now being processed
+                request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCHED, null);
+                throw t;
+            };
+            request.getCoyoteRequest().action(ActionCode.ASYNC_DISPATCH, null);
         }
     }
 
