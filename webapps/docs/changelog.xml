@@ -468,6 +468,9 @@
         Tomcat locally. Refactoring line-ending management in build.xml to
         reduce repeated line-ending changes. (markt)
       </fix>
+      <update>
+        Update UnboundID to 7.0.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
