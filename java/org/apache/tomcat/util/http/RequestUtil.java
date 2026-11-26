@@ -90,34 +90,50 @@ public class RequestUtil {
         }
 
         // Resolve occurrences of "//" in the normalized path
-        while (true) {
-            int index = normalized.indexOf("//");
-            if (index < 0) {
-                break;
+        // Single pass so that a long run of '/' is not O(n^2)
+        int doubleSlash = normalized.indexOf("//");
+        if (doubleSlash >= 0) {
+            StringBuilder sb = new StringBuilder(normalized.length());
+            sb.append(normalized, 0, doubleSlash + 1);
+            for (int i = doubleSlash + 2; i < normalized.length(); i++) {
+                char c = normalized.charAt(i);
+                if (c == '/' && sb.charAt(sb.length() - 1) == '/') {
+                    continue;
+                }
+                sb.append(c);
             }
-            normalized = normalized.substring(0, index) + normalized.substring(index + 1);
+            normalized = sb.toString();
         }
 
-        // Resolve occurrences of "/./" in the normalized path
-        while (true) {
-            int index = normalized.indexOf("/./");
-            if (index < 0) {
-                break;
+        // Resolve occurrences of "/./" and "/../" in the normalized path. Single pass over the path segments so that
+        // many such segments are not O(n^2). At this point there are no empty segments except after a trailing '/'.
+        if (normalized.contains("/./") || normalized.contains("/../")) {
+            int length = normalized.length();
+            StringBuilder sb = new StringBuilder(length);
+            int start = 1;
+            while (start <= length) {
+                int end = normalized.indexOf('/', start);
+                if (end < 0) {
+                    end = length;
+                }
+                int segmentLength = end - start;
+                if (segmentLength == 0) {
+                    // Only occurs for the trailing '/'
+                    sb.append('/');
+                } else if (segmentLength == 1 && normalized.charAt(start) == '.') {
+                    // "/./" - ignore
+                } else if (segmentLength == 2 && normalized.charAt(start) == '.' &&
+                        normalized.charAt(start + 1) == '.') {
+                    if (sb.length() == 0) {
+                        return null; // Trying to go outside our context
+                    }
+                    sb.setLength(sb.lastIndexOf("/"));
+                } else {
+                    sb.append('/').append(normalized, start, end);
+                }
+                start = end + 1;
             }
-            normalized = normalized.substring(0, index) + normalized.substring(index + 2);
-        }
-
-        // Resolve occurrences of "/../" in the normalized path
-        while (true) {
-            int index = normalized.indexOf("/../");
-            if (index < 0) {
-                break;
-            }
-            if (index == 0) {
-                return null; // Trying to go outside our context
-            }
-            int index2 = normalized.lastIndexOf('/', index - 1);
-            normalized = normalized.substring(0, index2) + normalized.substring(index + 3);
+            normalized = sb.toString();
         }
 
         if (normalized.length() > 1 && addedTrailingSlash) {
