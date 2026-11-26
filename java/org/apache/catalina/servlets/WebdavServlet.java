@@ -32,11 +32,14 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Deque;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -176,6 +179,10 @@ import org.xml.sax.SAXException;
  * <p>
  * By default, WebDAV request bodies for LOCK and PROPFIND are limited to 4096 bytes. To change this limit, set the
  * <code>maxRequestBodySize</code> <code>init-param</code> for the WebDAV servlet.
+ * <p>
+ * By default, a PROPFIND request may request at most 100 distinct properties. Repeats of the same property are ignored
+ * and do not count towards this limit. A request that exceeds the limit is rejected. To change the limit, set the
+ * <code>maxPropfindProperties</code> <code>init-param</code> for the WebDAV servlet.
  *
  * @see <a href="https://tools.ietf.org/html/rfc4918">RFC 4918</a>
  */
@@ -212,6 +219,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Default max request body size.
      */
     private static final int DEFAULT_MAX_REQUEST_BODY_SIZE = 4096;
+
+
+    /*
+     * Default maximum number of distinct properties that may be requested in a PROPFIND request.
+     */
+    private static final int DEFAULT_MAX_PROPFIND_PROPERTIES = 100;
 
 
     /**
@@ -271,6 +284,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private int maxRequestBodySize = DEFAULT_MAX_REQUEST_BODY_SIZE;
 
 
+    /** The maximum number of distinct properties that may be requested in a PROPFIND request. */
+    private int maxPropfindProperties = DEFAULT_MAX_PROPFIND_PROPERTIES;
+
+
     /**
      * Is access allowed via WebDAV to the special paths (/WEB-INF and /META-INF)?
      */
@@ -319,6 +336,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         if (getServletConfig().getInitParameter("maxRequestBodySize") != null) {
             maxRequestBodySize = Integer.parseInt(getServletConfig().getInitParameter("maxRequestBodySize"));
+        }
+
+        if (getServletConfig().getInitParameter("maxPropfindProperties") != null) {
+            maxPropfindProperties = Integer.parseInt(getServletConfig().getInitParameter("maxPropfindProperties"));
         }
 
         if (getServletConfig().getInitParameter("allowSpecialPaths") != null) {
@@ -868,6 +889,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         // Properties which are to be displayed.
         List<Node> properties = new ArrayList<>();
+        // Used to ignore properties that have been requested more than once
+        Set<String> propertyKeys = new HashSet<>();
         // Propfind depth
         int depth;
         // Propfind type
@@ -929,7 +952,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         case Node.TEXT_NODE:
                                             break;
                                         case Node.ELEMENT_NODE:
-                                            properties.add(currentNode2);
+                                            if (propertyKeys.add(getPropertyKey(currentNode2))) {
+                                                if (properties.size() >= maxPropfindProperties) {
+                                                    resp.sendError(WebdavStatus.SC_REQUEST_TOO_LONG);
+                                                    return;
+                                                }
+                                                properties.add(currentNode2);
+                                            }
                                             break;
                                     }
                                 }
@@ -986,11 +1015,28 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         XMLWriter generatedXML = new XMLWriter(resp.getWriter());
         generatedXML.writeXMLHeader();
 
-        generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
+        /*
+         * Properties that are not in the DAV: namespace and that can't be found are written to the response using the
+         * namespace of the property. Declare each of those namespaces once, on the root element, so that the URI is not
+         * repeated for every property of every resource.
+         */
+        Map<String,String> prefixToNamespace = new LinkedHashMap<>();
+        Map<String,String> namespaceToPrefix = new HashMap<>();
+        for (Node property : properties) {
+            String namespace = property.getNamespaceURI();
+            if (namespace != null && !namespace.isEmpty() && !DEFAULT_NAMESPACE.equals(namespace) &&
+                    !namespaceToPrefix.containsKey(namespace)) {
+                String prefix = "ns" + namespaceToPrefix.size();
+                namespaceToPrefix.put(namespace, prefix);
+                prefixToNamespace.put(prefix, namespace);
+            }
+        }
+
+        generatedXML.writeOpeningElement("D", DEFAULT_NAMESPACE, prefixToNamespace, "multistatus");
 
         if (depth == 0) {
             propfindResource(generatedXML, getEncodedPath(path, resource, req), path, type, properties,
-                    resource.isFile(), resource.getCreation(), resource.getLastModified(), resource.getContentLength(),
+                    namespaceToPrefix, resource.isFile(), resource.getCreation(), resource.getLastModified(), resource.getContentLength(),
                     getServletContext().getMimeType(resource.getName()), generateETag(resource));
         } else {
             // The stack always contains the object of the current level
@@ -1014,7 +1060,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 // Broken symlink or odd permission settings?
                 if (resource.exists()) {
                     propfindResource(generatedXML, getEncodedPath(currentPath, resource, req), currentPath, type,
-                            properties, resource.isFile(), resource.getCreation(), resource.getLastModified(),
+                            properties, namespaceToPrefix, resource.isFile(), resource.getCreation(), resource.getLastModified(),
                             resource.getContentLength(), getServletContext().getMimeType(resource.getName()),
                             generateETag(resource));
                 }
@@ -2599,8 +2645,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     private void propfindResource(XMLWriter generatedXML, String rewrittenUrl, String path, PropfindType propFindType,
-            List<Node> properties, boolean isFile, long created, long lastModified, long contentLength,
-            String contentType, String eTag) {
+            List<Node> properties, Map<String,String> namespaceToPrefix, boolean isFile, long created,
+            long lastModified, long contentLength, String contentType, String eTag) {
 
         generatedXML.writeElement("D", "response", XMLWriter.OPENING);
         String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " ";
@@ -2751,8 +2797,15 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         if (propertyNotFound != null) {
                             generatedXML.writeElement("D", propertyNotFound, XMLWriter.NO_CONTENT);
                         } else {
-                            generatedXML.writeElement(null, propertyNotFoundNode.getNamespaceURI(),
-                                    propertyNotFoundNode.getLocalName(), XMLWriter.NO_CONTENT);
+                            String prefix = namespaceToPrefix.get(propertyNotFoundNode.getNamespaceURI());
+                            if (prefix != null) {
+                                // The namespace is declared on the root element
+                                generatedXML.writeElement(prefix, null, propertyNotFoundNode.getLocalName(),
+                                        XMLWriter.NO_CONTENT);
+                            } else {
+                                generatedXML.writeElement(null, propertyNotFoundNode.getNamespaceURI(),
+                                        propertyNotFoundNode.getLocalName(), XMLWriter.NO_CONTENT);
+                            }
                         }
                     }
 
@@ -2834,6 +2887,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return node.getLocalName();
         }
         return null;
+    }
+
+
+    /*
+     * A key that identifies a property by namespace and local name. The local name can't contain '}' so the key is
+     * unambiguous.
+     */
+    private static String getPropertyKey(Node node) {
+        String namespace = node.getNamespaceURI();
+        return "{" + (namespace == null ? "" : namespace) + "}" + node.getLocalName();
     }
 
 

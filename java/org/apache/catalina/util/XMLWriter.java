@@ -18,6 +18,7 @@ package org.apache.catalina.util;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Map;
 
 import org.apache.tomcat.util.security.Escape;
 
@@ -112,6 +113,32 @@ public class XMLWriter {
         writeElement(namespace, name, OPENING);
         buffer.append(Escape.xml(value));
         writeElement(namespace, name, CLOSING);
+    }
+
+
+    /**
+     * Write an opening element that, in addition to the namespace of the element, declares further namespaces. Elements
+     * that follow can then refer to those namespaces using their prefix rather than repeating the namespace URI.
+     *
+     * @param namespace             Namespace abbreviation of the element
+     * @param namespaceInfo         Namespace URI of the element
+     * @param additionalNamespaces  The additional namespaces to declare. The key is the prefix and the value is the
+     *                                  namespace URI.
+     * @param name                  Element name
+     */
+    public void writeOpeningElement(String namespace, String namespaceInfo, Map<String,String> additionalNamespaces,
+            String name) {
+        if (lastWriteWasOpen) {
+            buffer.append('\n');
+        }
+        buffer.append('<').append(namespace).append(':').append(name).append(" xmlns:").append(namespace).append("=\"")
+                .append(Escape.xml(namespaceInfo)).append('"');
+        for (Map.Entry<String,String> entry : additionalNamespaces.entrySet()) {
+            buffer.append(" xmlns:").append(entry.getKey()).append("=\"").append(Escape.xml(entry.getValue()))
+                    .append('"');
+        }
+        buffer.append('>');
+        lastWriteWasOpen = true;
     }
 
 
