@@ -479,6 +479,9 @@
       <update>
         Update UnboundID to 7.0.6. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.10.5. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
