@@ -1923,6 +1923,162 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.fail("The response has no content type");
     }
 
+    /*
+     * Properties that are requested more than once are only processed once.
+     */
+    @Test
+    public void testPropfindDuplicateProperties() throws Exception {
+        String body = propfindBody("urn:test:a", "p", "p", "q", "p");
+        Client client = doTestPropfind(null, "0", body, 1);
+
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertEquals(1, count(client.getResponseBody(), "<ns0:p/>"));
+        Assert.assertEquals(1, count(client.getResponseBody(), "<ns0:q/>"));
+    }
+
+
+    /*
+     * The namespace of a property that can't be found is declared once on the root element rather than for every
+     * property of every resource.
+     */
+    @Test
+    public void testPropfindNamespaceDeclaredOnce() throws Exception {
+        String body = propfindBody("urn:test:a", "p", "q");
+        Client client = doTestPropfind(null, "1", body, 3);
+
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        String responseBody = client.getResponseBody();
+        // Collection plus 3 files
+        Assert.assertEquals(4, count(responseBody, "<D:response>"));
+        Assert.assertEquals(1, count(responseBody, "urn:test:a"));
+        Assert.assertEquals(1, count(responseBody, "<D:multistatus xmlns:D=\"DAV:\" xmlns:ns0=\"urn:test:a\">"));
+        Assert.assertEquals(4, count(responseBody, "<ns0:p/>"));
+        Assert.assertEquals(4, count(responseBody, "<ns0:q/>"));
+    }
+
+
+    @Test
+    public void testPropfindNamespacesDeclaredOnce() throws Exception {
+        String body = "<D:propfind xmlns:D=\"DAV:\" xmlns:A=\"urn:test:a\" xmlns:B=\"urn:test:b\"><D:prop>" +
+                "<A:p/><B:p/><A:q/><D:unknown/></D:prop></D:propfind>";
+        Client client = doTestPropfind(null, "0", body, 1);
+
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        String responseBody = client.getResponseBody();
+        Assert.assertEquals(1, count(responseBody, "xmlns:ns0=\"urn:test:a\""));
+        Assert.assertEquals(1, count(responseBody, "xmlns:ns1=\"urn:test:b\""));
+        Assert.assertEquals(1, count(responseBody, "<ns0:p/>"));
+        Assert.assertEquals(1, count(responseBody, "<ns1:p/>"));
+        Assert.assertEquals(1, count(responseBody, "<ns0:q/>"));
+        Assert.assertEquals(1, count(responseBody, "<D:unknown/>"));
+    }
+
+
+    @Test
+    public void testPropfindMaxPropertiesDefault() throws Exception {
+        String[] names = new String[100];
+        for (int i = 0; i < names.length; i++) {
+            names[i] = "p" + i;
+        }
+        startPropfind(null, 1);
+        Client client = sendPropfind("0", propfindBody("urn:test:a", names));
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+
+        String[] tooMany = new String[101];
+        for (int i = 0; i < tooMany.length; i++) {
+            tooMany[i] = "p" + i;
+        }
+        client = sendPropfind("0", propfindBody("urn:test:a", tooMany));
+        Assert.assertEquals(WebdavStatus.SC_REQUEST_TOO_LONG, client.getStatusCode());
+    }
+
+
+    /*
+     * Properties that are requested more than once do not count towards the limit.
+     */
+    @Test
+    public void testPropfindMaxPropertiesConfigured() throws Exception {
+        startPropfind("2", 1);
+        Client client = sendPropfind("0", propfindBody("urn:test:a", "p", "q", "p", "q", "p"));
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+
+        client = sendPropfind("0", propfindBody("urn:test:a", "p", "q", "r"));
+        Assert.assertEquals(WebdavStatus.SC_REQUEST_TOO_LONG, client.getStatusCode());
+    }
+
+
+    private static String propfindBody(String namespace, String... names) {
+        StringBuilder sb = new StringBuilder("<D:propfind xmlns:D=\"DAV:\" xmlns:T=\"");
+        sb.append(namespace);
+        sb.append("\"><D:prop>");
+        for (String name : names) {
+            sb.append("<T:").append(name).append("/>");
+        }
+        sb.append("</D:prop></D:propfind>");
+        return sb.toString();
+    }
+
+
+    private static int count(String text, String search) {
+        int count = 0;
+        int index = 0;
+        while ((index = text.indexOf(search, index)) != -1) {
+            count++;
+            index += search.length();
+        }
+        return count;
+    }
+
+
+    private Client doTestPropfind(String maxPropfindProperties, String depth, String body, int files)
+            throws Exception {
+        startPropfind(maxPropfindProperties, files);
+        return sendPropfind(depth, body);
+    }
+
+
+    private void startPropfind(String maxPropfindProperties, int files) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-propfind" + UUID.randomUUID());
+        tempWebapp.deleteOnExit();
+        Assert.assertTrue(tempWebapp.mkdirs());
+        for (int i = 0; i < files; i++) {
+            File file = new File(tempWebapp, "file" + i + ".txt");
+            Assert.assertTrue(file.createNewFile());
+            file.deleteOnExit();
+        }
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("listings", "true");
+        if (maxPropfindProperties != null) {
+            webdavServlet.addInitParameter("maxPropfindProperties", maxPropfindProperties);
+        }
+        ctxt.addServletMapping("/*", "webdav");
+        tomcat.start();
+    }
+
+
+    private Client sendPropfind(String depth, String body) throws Exception {
+        Client client = new Client();
+        client.setPort(getPort());
+        // @formatter:off
+        client.setRequest(new String[] {
+                "PROPFIND / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Depth: " + depth + CRLF +
+                    "Content-Length: " + body.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    body
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        return client;
+    }
+
+
     private static final class Client extends SimpleHttpClient {
 
         @Override

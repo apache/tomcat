@@ -197,6 +197,15 @@
         bound when <code>AsyncListener.onError()</code> is called for a failed
         asynchronous dispatch. (markt)
       </fix>
+      <fix>
+        Limit the number of distinct properties that a WebDAV
+        <code>PROPFIND</code> request may request to 100. The limit is
+        configurable using the new <code>maxPropfindProperties</code>
+        <code>init-param</code>. Properties that are requested more than once
+        are ignored. The namespace of a requested property that is not found is
+        now declared once on the root element of the response rather than being
+        repeated for every property of every resource. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
