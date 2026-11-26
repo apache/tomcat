@@ -461,6 +461,12 @@
         <code>destroy()</code> is only called if <code>init()</code> was called
         for the handler. (markt)
       </fix>
+      <fix>
+        Compare the value of the HTTP/2 <code>te</code> request header to
+        <code>trailers</code> case-insensitively, rather than resetting the
+        stream when the value is not in lower case. Pull request <pr>1273</pr>
+        provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

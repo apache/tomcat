@@ -258,6 +258,58 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
 
     @Test
+    public void testTeTrailers() throws Exception {
+        doTestTe("trailers", true);
+    }
+
+
+    @Test
+    public void testTeTrailersMixedCase() throws Exception {
+        doTestTe("Trailers", true);
+    }
+
+
+    @Test
+    public void testTeTrailersUpperCase() throws Exception {
+        doTestTe("TRAILERS", true);
+    }
+
+
+    @Test
+    public void testTeInvalid() throws Exception {
+        doTestTe("gzip", false);
+    }
+
+
+    private void doTestTe(String value, boolean valid) throws Exception {
+        http2Connect();
+
+        List<Header> headers = new ArrayList<>(5);
+        headers.add(new Header(":method", Method.GET));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/simple"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+        headers.add(new Header("te", value));
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildGetRequest(headersFrameHeader, headersPayload, null, headers, 3);
+
+        writeFrame(headersFrameHeader, headersPayload);
+
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        if (valid) {
+            Assert.assertTrue(trace, trace.contains("3-Header-[:status]-[200]"));
+        } else {
+            Assert.assertEquals("3-RST-[1]\n", trace);
+        }
+    }
+
+
+    @Test
     public void testHostHeaderValid() throws Exception {
         http2Connect();
 
