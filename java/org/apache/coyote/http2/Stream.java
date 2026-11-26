@@ -400,7 +400,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
 
         if ("te".equals(name)) {
-            if (!"trailers".equals(value)) {
+            // "trailers" is an ABNF literal so it is case-insensitive (RFC 9110, section 10.1.4 and RFC 5234)
+            if (!"trailers".equalsIgnoreCase(value)) {
                 headerException =
                         new StreamException(sm.getString("stream.header.te", getConnectionId(), getIdAsString(), value),
                                 Http2Error.PROTOCOL_ERROR, getIdAsInt());
