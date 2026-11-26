@@ -17,10 +17,21 @@
 package org.apache.coyote.http2;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.catalina.Context;
+import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.http.Method;
 
 public class TestRfc9218 extends Http2TestBase {
 
@@ -186,6 +197,73 @@ public class TestRfc9218 extends Http2TestBase {
     }
 
 
+    @Test
+    public void testPriorityHeaderFieldLinesCombined() throws Exception {
+        doTestPriorityHeaderFieldLinesCombined("u=0", "i");
+    }
+
+
+    @Test
+    public void testPriorityHeaderFieldLinesCombinedReversed() throws Exception {
+        doTestPriorityHeaderFieldLinesCombined("i", "u=0");
+    }
+
+
+    private void doTestPriorityHeaderFieldLinesCombined(String first, String second) throws Exception {
+        // The two field lines are combined into a single value (RFC 9651, section 4.2)
+        List<Header> priorityHeaders = new ArrayList<>(2);
+        priorityHeaders.add(new Header("priority", first));
+        priorityHeaders.add(new Header("priority", second));
+        blockStreams(priorityHeaders);
+
+        // Add 1k to the connection window. Should be used for stream 21.
+        sendWindowUpdate(0, 1024);
+        parser.readFrame();
+
+        Assert.assertEquals("21-Body-1024\n", output.getTrace());
+    }
+
+
+    @Test
+    public void testPriorityHeaderVisibleToApplication() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "priority", new PriorityHeaderServlet());
+        ctxt.addServletMapping("/priority", "priority");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        List<Header> headers = new ArrayList<>(6);
+        headers.add(new Header(":method", Method.GET));
+        headers.add(new Header(":scheme", "http"));
+        headers.add(new Header(":path", "/priority"));
+        headers.add(new Header(":authority", "localhost:" + getPort()));
+        headers.add(new Header("priority", "u=1"));
+        headers.add(new Header("priority", "i"));
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildGetRequest(frameHeader, headersPayload, null, headers, 3);
+        writeFrame(frameHeader, headersPayload);
+
+        // Headers
+        parser.readFrame();
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[x-priority]-[u=1, i]\n"));
+    }
+
+
     /*
      * Opens the connection and leaves streams 17, 19 and 21 blocked because the connection window is zero.
      *
@@ -194,6 +272,14 @@ public class TestRfc9218 extends Http2TestBase {
      * 21 - 8k body left
      */
     private void blockStreams() throws Exception {
+        blockStreams(null);
+    }
+
+
+    /*
+     * As blockStreams() with the given additional header fields in the request for stream 21.
+     */
+    private void blockStreams(List<Header> stream21Headers) throws Exception {
         http2Connect();
 
         /*
@@ -229,7 +315,20 @@ public class TestRfc9218 extends Http2TestBase {
 
         // Send additional requests. Connection window is empty so only headers will be returned.
         sendSimpleGetRequest(19);
-        sendSimpleGetRequest(21);
+        if (stream21Headers == null) {
+            sendSimpleGetRequest(21);
+        } else {
+            List<Header> headers = new ArrayList<>(4 + stream21Headers.size());
+            headers.add(new Header(":method", Method.GET));
+            headers.add(new Header(":scheme", "http"));
+            headers.add(new Header(":path", "/simple"));
+            headers.add(new Header(":authority", "localhost:" + getPort()));
+            headers.addAll(stream21Headers);
+            byte[] frameHeader = new byte[9];
+            ByteBuffer headersPayload = ByteBuffer.allocate(128);
+            buildGetRequest(frameHeader, headersPayload, null, headers, 21);
+            writeFrame(frameHeader, headersPayload);
+        }
 
         // 19-headers, 21-headers
         parser.readFrame();
@@ -259,5 +358,20 @@ public class TestRfc9218 extends Http2TestBase {
 
         os.write(priorityUpdateFrame);
         os.flush();
+    }
+
+
+    private static class PriorityHeaderServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+            List<String> values = new ArrayList<>();
+            req.getHeaders("priority").asIterator().forEachRemaining(values::add);
+            resp.setHeader("X-Priority", String.join(", ", values));
+            resp.setContentType("text/plain");
+            resp.getWriter().print("OK");
+        }
     }
 }

@@ -102,6 +102,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private StreamException headerException = null;
 
     private volatile StringBuilder cookieHeader = null;
+    private volatile StringBuilder priorityHeader = null;
     private volatile boolean hostHeaderSeen = false;
 
     private final Object pendingWindowUpdateForStreamLock = new Object();
@@ -535,22 +536,6 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 }
                 break;
             }
-            case "priority": {
-                try {
-                    Priority p = Priority.parsePriority(new StringReader(value));
-                    setUrgency(p.getUrgency());
-                    setIncremental(p.getIncremental());
-                } catch (IOException ioe) {
-                    // Not possible with StringReader
-                } catch (IllegalArgumentException iae) {
-                    // Invalid priority header field values should be ignored
-                    if (log.isTraceEnabled()) {
-                        log.trace(sm.getString("http2Parser.processFramePriorityUpdate.invalid", getConnectionId(),
-                                getIdAsString()), iae);
-                    }
-                }
-                break;
-            }
             default: {
                 if ("expect".equals(name) && "100-continue".equals(value)) {
                     coyoteRequest.setExpectation(true);
@@ -563,6 +548,15 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     // HTTP/2 headers are already always lower case
                     coyoteRequest.getMimeTrailerFields().addValue(name).setString(value);
                 } else {
+                    if ("priority".equals(name)) {
+                        // All field lines are combined before the value is parsed (RFC 9651, section 4.2)
+                        if (priorityHeader == null) {
+                            priorityHeader = new StringBuilder();
+                        } else {
+                            priorityHeader.append(", ");
+                        }
+                        priorityHeader.append(value);
+                    }
                     coyoteRequest.getMimeHeaders().addValue(name).setString(value);
                 }
             }
@@ -673,6 +667,23 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         // Can only do this once the headers are fully received
         if (cookieHeader != null) {
             coyoteRequest.getMimeHeaders().addValue("cookie").setString(cookieHeader.toString());
+        }
+
+        if (priorityHeader != null) {
+            try {
+                Priority p = Priority.parsePriority(new StringReader(priorityHeader.toString()));
+                setUrgency(p.getUrgency());
+                setIncremental(p.getIncremental());
+            } catch (IOException ioe) {
+                // Not possible with StringReader
+            } catch (IllegalArgumentException iae) {
+                // Invalid priority header field values should be ignored
+                if (log.isTraceEnabled()) {
+                    log.trace(sm.getString("http2Parser.processFramePriorityUpdate.invalid", getConnectionId(),
+                            getIdAsString()), iae);
+                }
+            }
+            priorityHeader = null;
         }
         return headerState == HEADER_STATE_REGULAR || headerState == HEADER_STATE_PSEUDO;
     }
