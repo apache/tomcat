@@ -461,6 +461,12 @@
         <code>destroy()</code> is only called if <code>init()</code> was called
         for the handler. (markt)
       </fix>
+      <fix>
+        Make the HTTP/2 <code>priority</code> request header available to
+        applications, as it is for HTTP/1.1, and combine multiple
+        <code>priority</code> field lines before parsing them as required by
+        RFC 9651. Pull request <pr>1274</pr> provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
