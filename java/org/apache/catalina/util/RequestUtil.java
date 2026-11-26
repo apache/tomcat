@@ -357,6 +357,10 @@ public final class RequestUtil {
             EncodedSolidusHandling encodedReverseSolidusHandling) {
         int len = uri.length;
         int pos = startPos;
+        // Skip any run of adjacent slashes so each candidate prefix ends after a non-empty path segment.
+        while (pos < len && uri[pos] == '/') {
+            pos++;
+        }
         while (pos < len) {
             if (uri[pos] == '/') {
                 return pos;

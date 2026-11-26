@@ -352,6 +352,9 @@
         <code>destroy()</code> is only called if <code>init()</code> was called
         for the handler. (markt)
       </fix>
+      <fix>
+        Improve performance of String based URI normalization. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
