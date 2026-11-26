@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.regex.Pattern;
 
 import javax.naming.AuthenticationException;
 import javax.naming.CompositeName;
@@ -145,6 +146,12 @@ public class JNDIRealm extends RealmBase {
 
     // Note: Usage assumes this value is escaped / doesn't need escaping
     private static final String NULL_USER_ROLE_ATTRIBUTE_PLACEHOLDER = "tomcat-unset-ignore";
+
+    /*
+     * JNDI treats a name that starts with a URL scheme (e.g. ldap://) as a URL, not as a name in the directory that is
+     * being accessed, and connects to the host in the URL. No DN can start in this way.
+     */
+    private static final Pattern URL_SCHEME_PATTERN = Pattern.compile("^[A-Za-z][A-Za-z0-9+.-]*:");
 
     private static final String AUTHENTICATION_NAME_GSSAPI = "GSSAPI";
     private static final String AUTHENTICATION_NAME_SIMPLE = "simple";
@@ -1744,6 +1751,18 @@ public class JNDIRealm extends RealmBase {
         // an attribute value.
         String dn = connection.userPatternFormatArray[curUserPattern]
                 .format(new String[] { doAttributeValueEscaping(username) });
+
+        /*
+         * If the pattern starts with the user name, the user controls the start of the DN. JNDI would treat a DN that
+         * starts with a URL scheme as a URL, connect to the host in the URL (using the credentials of this realm) and
+         * look up the user there.
+         */
+        if (URL_SCHEME_PATTERN.matcher(dn).find()) {
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("jndiRealm.userPatternUrl", dn));
+            }
+            return null;
+        }
 
         try {
             user = getUserByPattern(connection.context, username, attrIds, dn);

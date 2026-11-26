@@ -206,6 +206,14 @@
         now declared once on the root element of the response rather than being
         repeated for every property of every resource. (markt)
       </fix>
+      <fix>
+        When <code>JNDIRealm</code> uses <code>userPattern</code> and the
+        pattern allows the user name to form the start of the distinguished
+        name (DN), reject a user name that results in a DN that starts with a
+        URL scheme such as <code>ldap://</code>. JNDI treats such a DN as a URL
+        and connects to the host named in the URL using the credentials of the
+        realm. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
