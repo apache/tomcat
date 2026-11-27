@@ -58,6 +58,7 @@ public class JreCompat {
     private static final boolean jre20Available;
     private static final boolean jre21Available;
     private static final boolean jre22Available;
+    private static final boolean jre25Available;
 
     protected static final String USE_CANON_CACHES_CMD_ARG = "-Dsun.io.useCanonCaches=";
     protected static volatile Boolean canonCachesDisabled;
@@ -79,8 +80,19 @@ public class JreCompat {
 
         // This is Tomcat 10.1.x with a minimum Java version of Java 11.
         // Look for the highest supported JVM first
-        if (Jre22Compat.isSupported()) {
+        if (Jre25Compat.isSupported()) {
+            instance = new Jre25Compat();
+            jre25Available = true;
+            jre22Available = true;
+            jre21Available = true;
+            jre20Available = true;
+            jre19Available = true;
+            jre17Available = true;
+            jre16Available = true;
+            jre12Available = true;
+        } else if (Jre22Compat.isSupported()) {
             instance = new Jre22Compat();
+            jre25Available = false;
             jre22Available = true;
             jre21Available = true;
             jre20Available = true;
@@ -90,6 +102,7 @@ public class JreCompat {
             jre12Available = true;
         } else if (Jre21Compat.isSupported()) {
             instance = new Jre21Compat();
+            jre25Available = false;
             jre22Available = false;
             jre21Available = true;
             jre20Available = true;
@@ -99,6 +112,7 @@ public class JreCompat {
             jre12Available = true;
         } else if (Jre20Compat.isSupported()) {
             instance = new Jre20Compat();
+            jre25Available = false;
             jre22Available = false;
             jre21Available = false;
             jre20Available = true;
@@ -108,6 +122,7 @@ public class JreCompat {
             jre12Available = true;
         } else if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
+            jre25Available = false;
             jre22Available = false;
             jre21Available = false;
             jre20Available = false;
@@ -117,6 +132,7 @@ public class JreCompat {
             jre12Available = true;
         } else if (Jre17Compat.isSupported()) {
             instance = new Jre17Compat();
+            jre25Available = false;
             jre22Available = false;
             jre21Available = false;
             jre20Available = false;
@@ -126,6 +142,7 @@ public class JreCompat {
             jre12Available = true;
         } else if (Jre16Compat.isSupported()) {
             instance = new Jre16Compat();
+            jre25Available = false;
             jre22Available = false;
             jre21Available = false;
             jre20Available = false;
@@ -135,6 +152,7 @@ public class JreCompat {
             jre12Available = true;
         } else if (Jre12Compat.isSupported()) {
             instance = new Jre12Compat();
+            jre25Available = false;
             jre22Available = false;
             jre21Available = false;
             jre20Available = false;
@@ -144,6 +162,7 @@ public class JreCompat {
             jre12Available = true;
         } else {
             instance = new JreCompat();
+            jre25Available = false;
             jre22Available = false;
             jre21Available = false;
             jre20Available = false;
@@ -212,6 +231,16 @@ public class JreCompat {
      */
     public static boolean isJre22Available() {
         return jre22Available;
+    }
+
+
+    /**
+     * Check if JRE 25 is available.
+     *
+     * @return {@code true} if JRE 25 is available
+     */
+    public static boolean isJre25Available() {
+        return jre25Available;
     }
 
 
