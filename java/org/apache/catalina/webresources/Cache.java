@@ -60,6 +60,13 @@ public class Cache {
 
     private final ConcurrentMap<String,CachedResource> resourceCache = new ConcurrentHashMap<>();
 
+    /*
+     * Time before which no cache entry can be evicted. Set when an eviction has removed every expired entry so that
+     * requests do not scan the whole cache again before an entry can expire. Entries added later expire no earlier,
+     * since every cached entry is checked against the current time plus the TTL.
+     */
+    private volatile long noEvictionBefore = 0;
+
     /**
      * Constructs a cache for the given root.
      *
@@ -125,12 +132,7 @@ public class Cache {
                 }
 
                 if (size.get() > maxSize) {
-                    // Process resources unordered for speed. Trades cache
-                    // efficiency (younger entries may be evicted before older
-                    // ones) for speed since this is on the critical path for
-                    // request processing
-                    long targetSize = maxSize * (100 - TARGET_FREE_PERCENT_GET) / 100;
-                    long newSize = evict(targetSize, resourceCache.values().iterator());
+                    long newSize = evictOnRequest();
                     if (newSize > maxSize) {
                         // Unable to create sufficient space for this resource
                         // Remove it from the cache
@@ -213,12 +215,7 @@ public class Cache {
                 }
 
                 if (size.get() > maxSize) {
-                    // Process resources unordered for speed. Trades cache
-                    // efficiency (younger entries may be evicted before older
-                    // ones) for speed since this is on the critical path for
-                    // request processing
-                    long targetSize = maxSize * (100 - TARGET_FREE_PERCENT_GET) / 100;
-                    long newSize = evict(targetSize, resourceCache.values().iterator());
+                    long newSize = evictOnRequest();
                     if (newSize > maxSize) {
                         // Unable to create sufficient space for this resource
                         // Remove it from the cache
@@ -276,17 +273,32 @@ public class Cache {
                 (path.startsWith("/WEB-INF/lib/") && path.endsWith(".jar"));
     }
 
+    private long evictOnRequest() {
+        if (System.currentTimeMillis() < noEvictionBefore) {
+            // No entry has expired since the last eviction removed every expired entry
+            return size.get();
+        }
+
+        // Process resources unordered for speed. Trades cache efficiency (younger entries may be evicted before older
+        // ones) for speed since this is on the critical path for request processing
+        long targetSize = maxSize * (100 - TARGET_FREE_PERCENT_GET) / 100;
+        return evict(targetSize, resourceCache.values().iterator());
+    }
+
     private long evict(long targetSize, Iterator<CachedResource> iter) {
 
         long now = System.currentTimeMillis();
 
         long newSize = size.get();
+        long earliestNextCheck = Long.MAX_VALUE;
 
         while (newSize > targetSize && iter.hasNext()) {
             CachedResource resource = iter.next();
 
             // Don't expire anything that has been checked within the TTL
-            if (resource.getNextCheck() > now) {
+            long nextCheck = resource.getNextCheck();
+            if (nextCheck > now) {
+                earliestNextCheck = Math.min(earliestNextCheck, nextCheck);
                 continue;
             }
 
@@ -294,6 +306,11 @@ public class Cache {
             removeCacheEntry(resource.getWebappPath());
 
             newSize = size.get();
+        }
+
+        if (newSize > targetSize && earliestNextCheck != Long.MAX_VALUE) {
+            // Every expired entry has been removed
+            noEvictionBefore = earliestNextCheck;
         }
 
         return newSize;
@@ -347,6 +364,7 @@ public class Cache {
      */
     public void setTtl(long ttl) {
         this.ttl = ttl;
+        noEvictionBefore = 0;
     }
 
     /**

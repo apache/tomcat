@@ -318,6 +318,12 @@
         and connects to the host named in the URL using the credentials of the
         realm. (markt)
       </fix>
+      <fix>
+        When the static resource cache is full and none of the cached entries
+        has expired, do not scan the whole cache for entries to evict on every
+        cache miss until the first entry expires. Pull request
+        <pr>1275</pr> provided by Arturo Bernal.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
