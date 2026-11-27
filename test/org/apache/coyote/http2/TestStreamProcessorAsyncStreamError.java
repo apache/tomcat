@@ -125,8 +125,9 @@ public class TestStreamProcessorAsyncStreamError extends Http2TestBase {
      */
     @Test
     public void testStreamErrorThenStreamPrunedBeforeEventProcessed() throws Exception {
-        // Retain at most 5 * 2 streams
-        maxConcurrentStreams = 2;
+        // Retain at most 5 * 3 streams. One more than the active (blocking) stream and the retained (errored, ERROR event
+        // queued) stream so that new streams are not refused
+        maxConcurrentStreams = 3;
         // Only one stream may be processed at a time
         maxConcurrentStreamExecution = 1;
         startAsyncRequest();
