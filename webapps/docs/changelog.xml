@@ -710,6 +710,9 @@
       <update>
         Update bnd to 7.5.0. (markt)
       </update>
+      <update>
+        Update Bouncy Castle to 1.87. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
