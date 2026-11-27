@@ -476,6 +476,11 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
     }
 
 
+    Stream getStream() {
+        return stream;
+    }
+
+
     @Override
     public final void recycle() {
         // StreamProcessor instances are not re-used.
