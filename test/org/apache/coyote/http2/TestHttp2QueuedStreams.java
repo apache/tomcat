@@ -248,14 +248,17 @@ public class TestHttp2QueuedStreams extends Http2TestBase {
             Thread.sleep(50);
         }
         Assert.assertEquals(0, blocked.get());
+        /*
+         * The notification for the started asynchronous request is processed. Whether the other events queued by the
+         * close are also processed depends on writes to the closed socket completing so is not asserted here.
+         */
         Assert.assertEquals("onError() calls", 1, asyncErrors.get());
-        waitForQueuedStreams(0);
-        waitForRetainedStreams(0);
     }
 
 
     /*
-     * Nothing in the queue will be processed once the connection has closed so it must be released.
+     * Streams that are waiting to start processing never will once the connection has closed so they must be
+     * released.
      */
     @Test
     public void testQueueIsClearedOnClose() throws Exception {
@@ -271,7 +274,12 @@ public class TestHttp2QueuedStreams extends Http2TestBase {
 
         handler.close();
 
-        waitForQueuedStreams(0);
+        /*
+         * Streams that have not started processing are released. Events queued for streams that have started (e.g. the
+         * error notifications queued by the close) stay in the queue. They are processed as execution slots become
+         * available which, as the socket is closed, depends on writes completing so it is not asserted here.
+         */
+        waitForNoQueuedStreamStarts();
     }
 
 
@@ -334,6 +342,28 @@ public class TestHttp2QueuedStreams extends Http2TestBase {
         writeFrame(headersFrameHeader, headersPayload);
         sendData(streamId, new byte[1024]);
         sendData(streamId, new byte[1024]);
+    }
+
+
+    private void waitForNoQueuedStreamStarts() throws Exception {
+        Field queueField = Http2UpgradeHandler.class.getDeclaredField("queuedRunnable");
+        queueField.setAccessible(true);
+
+        int waiting = -1;
+        long end = System.nanoTime() + 5_000_000_000L;
+        while (System.nanoTime() < end) {
+            waiting = 0;
+            for (Object streamRunnable : (Queue<?>) queueField.get(handler)) {
+                if (((StreamRunnable) streamRunnable).isInitial()) {
+                    waiting++;
+                }
+            }
+            if (waiting == 0) {
+                return;
+            }
+            Thread.sleep(50);
+        }
+        Assert.assertEquals("queued stream starts", 0, waiting);
     }
 
 
