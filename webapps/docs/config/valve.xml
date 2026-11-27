@@ -2589,6 +2589,10 @@ RequestHeader unset SSL_CLIENT_ESCAPED_CERT</source>
     <li><b><code>permitDenied</code></b> may be overridden to add error handling
     when a permit isn't granted.</li>
     </ul>
+    <p>If configured with the <strong>RewriteValve</strong>, it is recommended
+    that the <strong>RewriteValve</strong> is configured before the
+    <strong>SemaphoreValve</strong> to avoid issues with re-written requests
+    consuming an additional permit per rewrite.</p>
 
   </subsection>
 
@@ -2682,6 +2686,11 @@ RequestHeader unset SSL_CLIENT_ESCAPED_CERT</source>
 
     <p>The <strong>PersistentValve</strong> that implements per-request session
     persistence. It is intended to be used with non-sticky load-balancers.</p>
+
+    <p>If configured with the <strong>RewriteValve</strong>, it is recommended
+    that the <strong>RewriteValve</strong> is configured before the
+    <strong>PersistentValve</strong> to avoid issues with re-written requests
+    consuming an additional permit per rewrite.</p>
 
   </subsection>
 

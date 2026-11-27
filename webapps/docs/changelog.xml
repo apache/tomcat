@@ -647,6 +647,11 @@
         Tapestry attributes, used for locale session sorting. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Document the ordering requirements for the
+        <strong>SemaphoreValve</strong> and the <strong>PersistentValve</strong>
+        when used with the <strong>RewriteValve</strong>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Tribes">
