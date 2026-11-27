@@ -980,6 +980,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             }
         }
         replace();
+        // If processing of this stream has not started, it never will
+        handler.discardQueuedStream(this);
     }
 
 

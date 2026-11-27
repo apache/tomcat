@@ -20,12 +20,16 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -189,6 +193,19 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     // Stream concurrency control
     private AtomicInteger streamConcurrency = null;
     private Queue<StreamRunnable> queuedRunnable = null;
+    /*
+     * The runnables in queuedRunnable indexed by stream ID. The lists are only ever modified inside the atomic compute
+     * methods of the map so no further synchronization is required. This allows the runnables for a stream to be found
+     * without scanning the queue.
+     */
+    private Map<Integer,List<StreamRunnable>> queuedRunnableByStream = null;
+    /*
+     * Streams that are no longer active (so no longer count towards the limit on the number of active streams) but
+     * still have at least one runnable waiting in queuedRunnable. Modified only inside the atomic compute methods of
+     * queuedRunnableByStream. These streams still consume resources so they are included when enforcing the limit on
+     * the number of concurrent streams.
+     */
+    private final Set<Integer> retainedQueuedStreams = ConcurrentHashMap.newKeySet();
 
     // Track 'overhead' frames vs 'request/response' frames
     private final AtomicLong overheadCount;
@@ -270,6 +287,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (protocol.getMaxConcurrentStreamExecution() < localSettings.getMaxConcurrentStreams()) {
             streamConcurrency = new AtomicInteger(0);
             queuedRunnable = new ConcurrentLinkedQueue<>();
+            queuedRunnableByStream = new ConcurrentHashMap<>();
         }
 
         parser = getParser(connectionId);
@@ -392,7 +410,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     protected void processStreamOnContainerThread(Stream stream) {
         StreamProcessor streamProcessor = new StreamProcessor(this, stream, adapter, socketWrapper);
         streamProcessor.setSslSupport(sslSupport);
-        processStreamOnContainerThread(streamProcessor, SocketEvent.OPEN_READ);
+        processStreamOnContainerThread(streamProcessor, SocketEvent.OPEN_READ, true);
     }
 
 
@@ -409,7 +427,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     void processStreamOnContainerThread(StreamProcessor streamProcessor, SocketEvent event) {
-        StreamRunnable streamRunnable = new StreamRunnable(streamProcessor, event);
+        processStreamOnContainerThread(streamProcessor, event, false);
+    }
+
+
+    void processStreamOnContainerThread(StreamProcessor streamProcessor, SocketEvent event, boolean initial) {
+        StreamRunnable streamRunnable = new StreamRunnable(streamProcessor, event, initial);
         if (streamConcurrency == null) {
             socketWrapper.execute(streamRunnable);
         } else {
@@ -417,9 +440,87 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 increaseStreamConcurrency();
                 socketWrapper.execute(streamRunnable);
             } else {
-                queuedRunnable.offer(streamRunnable);
+                queueStreamRunnable(streamRunnable);
             }
         }
+    }
+
+
+    private void queueStreamRunnable(StreamRunnable streamRunnable) {
+        Stream stream = streamRunnable.getProcessor().getStream();
+        queuedRunnableByStream.compute(Integer.valueOf(stream.getIdAsInt()), (id, runnables) -> {
+            if (runnables == null) {
+                runnables = new ArrayList<>(2);
+            }
+            runnables.add(streamRunnable);
+            if (!stream.isActive()) {
+                // Reset or closed before this runnable was queued
+                retainedQueuedStreams.add(id);
+            }
+            return runnables;
+        });
+        queuedRunnable.offer(streamRunnable);
+    }
+
+
+    /**
+     * Discards a stream that is waiting for an execution slot if that stream can no longer be processed because it has
+     * been reset or closed due to an error. A reset stream frees its slot in the limit on the number of active streams
+     * so, if the stream were left in the queue, the number of streams in the queue (and the memory they use) would not
+     * be limited. Streams that have started processing clean-up for themselves so are not affected but, if they still
+     * have work in the queue, they continue to count towards the limit on the number of concurrent streams until that
+     * work has been processed.
+     *
+     * @param stream the stream that has been reset or closed
+     */
+    void discardQueuedStream(Stream stream) {
+        if (queuedRunnableByStream == null) {
+            return;
+        }
+        StreamRunnable[] discarded = new StreamRunnable[1];
+        queuedRunnableByStream.computeIfPresent(Integer.valueOf(stream.getIdAsInt()), (id, runnables) -> {
+            StreamRunnable initial = null;
+            for (StreamRunnable streamRunnable : runnables) {
+                if (streamRunnable.isInitial()) {
+                    initial = streamRunnable;
+                    break;
+                }
+            }
+            if (initial == null || !queuedRunnable.remove(initial)) {
+                // Processing has started (or is about to). The processor will perform the clean-up.
+                retainedQueuedStreams.add(id);
+                return runnables;
+            }
+            // Processing of this stream will never start so no event for it can be processed
+            for (StreamRunnable streamRunnable : runnables) {
+                queuedRunnable.remove(streamRunnable);
+            }
+            // Any event queued for this stream (e.g. by the reset) was only retained until it was processed
+            retainedQueuedStreams.remove(id);
+            discarded[0] = initial;
+            return null;
+        });
+
+        if (discarded[0] != null) {
+            // Perform the clean-up that would have been performed by the processor
+            StreamProcessor streamProcessor = discarded[0].getProcessor();
+            stream.close(null);
+            streamProcessor.recycle();
+            stream.recycle(false);
+        }
+    }
+
+
+    private void removeFromQueueIndex(StreamRunnable streamRunnable) {
+        queuedRunnableByStream.computeIfPresent(Integer.valueOf(streamRunnable.getProcessor().getStream().getIdAsInt()),
+                (id, runnables) -> {
+                    runnables.remove(streamRunnable);
+                    if (runnables.isEmpty()) {
+                        retainedQueuedStreams.remove(id);
+                        return null;
+                    }
+                    return runnables;
+                });
     }
 
 
@@ -695,6 +796,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (getStreamConcurrency() < protocol.getMaxConcurrentStreamExecution()) {
             StreamRunnable streamRunnable = queuedRunnable.poll();
             if (streamRunnable != null) {
+                removeFromQueueIndex(streamRunnable);
                 increaseStreamConcurrency();
                 socketWrapper.execute(streamRunnable);
             }
@@ -1665,6 +1767,18 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 ((Stream) stream).receiveReset(Http2Error.CANCEL.getCode());
             }
         }
+        /*
+         * Streams that are waiting to start processing never will so release them. Events queued for streams that have
+         * started processing (e.g. the error notification queued by the reset above) must still be processed as that is
+         * what cleans up the processor so those remain in the queue and are executed as slots become available.
+         */
+        if (queuedRunnable != null) {
+            for (StreamRunnable streamRunnable : queuedRunnable) {
+                if (streamRunnable.isInitial()) {
+                    discardQueuedStream(streamRunnable.getProcessor().getStream());
+                }
+            }
+        }
         try {
             socketWrapper.close();
         } catch (Exception e) {
@@ -2009,7 +2123,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             boolean processStream = false;
             if (stream.isActive()) {
                 if (stream.receivedEndOfHeaders()) {
-                    if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.get()) {
+                    if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.get() +
+                            retainedQueuedStreams.size()) {
                         decrementActiveRemoteStreamCount(stream);
                         // Ignoring maxConcurrentStreams increases the overhead count
                         increaseOverheadCount(FrameType.HEADERS);
@@ -2073,6 +2188,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (active) {
                 decrementActiveRemoteStreamCount(stream);
             }
+            // If processing of this stream has not started, it never will
+            discardQueuedStream(stream);
         }
     }
 

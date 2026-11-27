@@ -508,6 +508,13 @@
         notification for the request is only dispatched once, even if the reset
         is processed more than once. (markt)
       </fix>
+      <fix>
+        Remove an HTTP/2 stream that is waiting for an execution slot from the
+        queue of streams waiting to be processed when the stream is reset or
+        closed due to an error. A stream that has been reset but still has work
+        waiting to be processed continues to count towards the limit on the
+        number of concurrent streams until that work has been processed. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -22,11 +22,24 @@ class StreamRunnable implements Runnable {
 
     private final StreamProcessor processor;
     private final SocketEvent event;
+    // Is this the runnable that starts processing of the stream?
+    private final boolean initial;
 
 
-    StreamRunnable(StreamProcessor processor, SocketEvent event) {
+    StreamRunnable(StreamProcessor processor, SocketEvent event, boolean initial) {
         this.processor = processor;
         this.event = event;
+        this.initial = initial;
+    }
+
+
+    StreamProcessor getProcessor() {
+        return processor;
+    }
+
+
+    boolean isInitial() {
+        return initial;
     }
 
 
