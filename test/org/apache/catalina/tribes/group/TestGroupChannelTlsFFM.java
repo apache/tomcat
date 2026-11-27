@@ -31,7 +31,7 @@ public class TestGroupChannelTlsFFM extends GroupChannelTlsTestBase {
 
     @Before
     public void setup() throws Exception {
-        Assume.assumeTrue("FFM requires Java 22+", JreCompat.isJre22Available());
+        Assume.assumeTrue("FFM support is compiled with Java 25+", JreCompat.isJre25Available());
         try {
             openSSLLibraryInit();
         } catch (Throwable t) {
