@@ -635,6 +635,16 @@
     circumstances, correct application of the security constraint depends on the
     implementation of the Servlet. All servlets included with Tomcat will behave
     correctly in this scenario.</p>
+
+    <p>For the purposes of matching security constraints, <code>/path</code> and
+    <code>/path/</code> are different URLs. An exact match pattern such as
+    <code>/path</code> does not apply to a request for <code>/path/</code>.
+    A servlet mapped to <code>/path/*</code> will typically serve the same
+    resource, the directory or collection, for both <code>/path</code> and
+    <code>/path/</code>. A constraint that is intended to protect a directory or
+    the root of a servlet mapping should therefore use a prefix pattern such as
+    <code>/path/*</code>, which matches both forms and everything below them, or
+    should list both <code>/path</code> and <code>/path/</code>.</p>
   </section>
 
   <section name="Embedded Tomcat">
