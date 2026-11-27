@@ -214,6 +214,13 @@
         and connects to the host named in the URL using the credentials of the
         realm. (markt)
       </fix>
+      <fix>
+        When the WebDAV servlet processes a request for a path that ends with
+        <code>/</code>, only remove the trailing <code>/</code> if the path
+        identifies an existing collection. A path that ends with <code>/</code>
+        is no longer treated as a request for the file with the same name
+        without the trailing <code>/</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

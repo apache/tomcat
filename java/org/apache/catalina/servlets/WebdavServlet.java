@@ -805,7 +805,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
         String resultString = result.toString();
         if (!allowEmptyPath && resultString.length() > 1 && resultString.endsWith("/")) {
-            resultString = resultString.substring(0, resultString.length() - 1);
+            String strippedPath = resultString.substring(0, resultString.length() - 1);
+            if (resources.getResource(strippedPath).isDirectory()) {
+                resultString = strippedPath;
+            }
         }
         return resultString;
     }
