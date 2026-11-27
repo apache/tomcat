@@ -1389,6 +1389,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         private volatile long readTimeoutExpiry;
         private volatile boolean closed;
         private volatile boolean resetReceived;
+        private volatile boolean resetErrorDispatched;
 
         @Override
         public final int doRead(ApplicationBufferHandler applicationBufferHandler) throws IOException {
@@ -1644,9 +1645,10 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
              * StreamProcessor recycling the Stream. The use of recycledLock ensures that an attempt is not made to
              * notify the ReadListener after the Stream has been recycled.
              */
-            if (!recycled) {
+            if (!recycled && !resetErrorDispatched) {
                 synchronized (recycledLock) {
-                    if (!recycled) {
+                    if (!recycled && !resetErrorDispatched) {
+                        resetErrorDispatched = true;
                         // Trigger ReadListener.onError()
                         getCoyoteRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION,
                                 new IOException(sm.getString("stream.clientResetRequest")));
