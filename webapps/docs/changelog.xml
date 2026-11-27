@@ -372,6 +372,11 @@
       <fix>
         Improve performance of String based URI normalization. (markt)
       </fix>
+      <fix>
+        Ensure that, when a client resets an HTTP/2 stream, the error
+        notification for the request is only dispatched once, even if the reset
+        is processed more than once. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
