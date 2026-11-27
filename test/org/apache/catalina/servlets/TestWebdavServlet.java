@@ -21,7 +21,10 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,6 +39,7 @@ import org.junit.Test;
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.servlets.WebdavServlet.PropertyStore;
 import org.apache.catalina.servlets.WebdavServlet.ProppatchOperation;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -43,6 +47,9 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.descriptor.web.SecurityCollection;
+import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.websocket.server.WsContextListener;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -241,6 +248,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
     }
 
     private static final String CONTENT = "FOOBAR";
+
+    private static final String WEBDAV_USER = "webdav-rw";
+    private static final String WEBDAV_PWD = "pwd";
+    private static final String APP_ADMIN_ROLE = "app-admin";
 
     // @formatter:off
     private static final String LOCK_BODY =
@@ -1778,6 +1789,196 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertTrue(client.getResponseBody().contains("<D:href>/myfolder/file.txt</D:href>"));
         assertXmlContentType(client);
         validateXml(client.getResponseBody());
+    }
+
+
+    @Test
+    public void testTrailingSlashExactPathConstraint() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-trailing-slash-" + UUID.randomUUID());
+        tempWebapp.deleteOnExit();
+        Assert.assertTrue(tempWebapp.mkdirs());
+        File docDir = new File(tempWebapp, "doc");
+        Assert.assertTrue(docDir.mkdirs());
+
+        File putFile = new File(docDir, "put.txt");
+        File deleteFile = new File(docDir, "delete.txt");
+        File proppatchFile = new File(docDir, "proppatch.txt");
+        File newFile = new File(docDir, "new.txt");
+        createFile(putFile);
+        createFile(deleteFile);
+        createFile(proppatchFile);
+
+        tomcat.addUser(WEBDAV_USER, WEBDAV_PWD);
+        tomcat.addRole(WEBDAV_USER, WEBDAV_USER);
+
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("readonly", "false");
+        ctxt.addServletMapping("/webdav/*", "webdav");
+
+        SecurityCollection protectedFiles = new SecurityCollection();
+        protectedFiles.addPattern("/webdav/doc/put.txt");
+        protectedFiles.addPattern("/webdav/doc/delete.txt");
+        protectedFiles.addPattern("/webdav/doc/proppatch.txt");
+        SecurityConstraint protectedFilesConstraint = new SecurityConstraint();
+        protectedFilesConstraint.addAuthRole(APP_ADMIN_ROLE);
+        protectedFilesConstraint.addCollection(protectedFiles);
+        ctxt.addConstraint(protectedFilesConstraint);
+
+        SecurityCollection webdavCollection = new SecurityCollection();
+        webdavCollection.addPattern("/webdav/*");
+        SecurityConstraint webdavConstraint = new SecurityConstraint();
+        webdavConstraint.addAuthRole(WEBDAV_USER);
+        webdavConstraint.addCollection(webdavCollection);
+        ctxt.addConstraint(webdavConstraint);
+
+        LoginConfig lc = new LoginConfig();
+        lc.setAuthMethod("BASIC");
+        ctxt.setLoginConfig(lc);
+        ctxt.getPipeline().addValve(new BasicAuthenticator());
+
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+        String authorization = basicAuthorization(WEBDAV_USER, WEBDAV_PWD);
+
+        // Plain requests must be denied and leave the files unchanged
+        sendRequest(client, createRequest("PUT", "/webdav/doc/put.txt", authorization, CONTENT));
+        Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, client.getStatusCode());
+        Assert.assertEquals(CONTENT, Files.readString(putFile.toPath()));
+
+        sendRequest(client, createRequest("DELETE", "/webdav/doc/delete.txt", authorization, null));
+        Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, client.getStatusCode());
+        Assert.assertTrue(deleteFile.exists());
+
+        sendRequest(client, createRequest("PROPPATCH", "/webdav/doc/proppatch.txt", authorization,
+                PROPPATCH_PROPNAME));
+        Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, client.getStatusCode());
+
+        // The trailing slash bypasses the exact path constraint, but the path
+        // must not be normalized to the protected file
+        sendRequest(client, createRequest("PUT", "/webdav/doc/put.txt/", authorization, "REPLACED"));
+        Assert.assertEquals(HttpServletResponse.SC_CONFLICT, client.getStatusCode());
+        Assert.assertEquals(CONTENT, Files.readString(putFile.toPath()));
+
+        sendRequest(client, createRequest("DELETE", "/webdav/doc/delete.txt/", authorization, null));
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
+        Assert.assertTrue(deleteFile.exists());
+
+        sendRequest(client, createRequest("PROPPATCH", "/webdav/doc/proppatch.txt/", authorization,
+                PROPPATCH_PROPNAME));
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
+
+        // A trailing slash must not create a new file. The slash is never part
+        // of a file name; it indicates a collection.
+        sendRequest(client, createRequest("PUT", "/webdav/doc/new.txt/", authorization, CONTENT));
+        Assert.assertEquals(HttpServletResponse.SC_CONFLICT, client.getStatusCode());
+        Assert.assertFalse(newFile.exists());
+    }
+
+
+    @Test
+    public void testTrailingSlashExtensionConstraint() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-trailing-slash-jsp-" + UUID.randomUUID());
+        tempWebapp.deleteOnExit();
+        Assert.assertTrue(tempWebapp.mkdirs());
+
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("readonly", "false");
+        ctxt.addServletMapping("/webdav/*", "webdav");
+
+        SecurityCollection jspCollection = new SecurityCollection();
+        jspCollection.addPattern("*.jsp");
+        jspCollection.addMethod("PUT");
+        SecurityConstraint jspConstraint = new SecurityConstraint();
+        jspConstraint.addAuthRole(APP_ADMIN_ROLE);
+        jspConstraint.addCollection(jspCollection);
+        ctxt.addConstraint(jspConstraint);
+
+        LoginConfig lc = new LoginConfig();
+        lc.setAuthMethod("BASIC");
+        ctxt.setLoginConfig(lc);
+        ctxt.getPipeline().addValve(new BasicAuthenticator());
+
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+        File plantedJsp = new File(tempWebapp, "planted.jsp");
+
+        // Plain request is protected by the *.jsp constraint
+        sendRequest(client, createRequest("PUT", "/webdav/planted.jsp", null, "PLANTED-JSP-42"));
+        Assert.assertEquals(HttpServletResponse.SC_UNAUTHORIZED, client.getStatusCode());
+        Assert.assertFalse(plantedJsp.exists());
+
+        // The trailing slash bypasses the *.jsp constraint, but the path must
+        // not be normalized to a JSP and written
+        sendRequest(client, createRequest("PUT", "/webdav/planted.jsp/", null, "PLANTED-JSP-42"));
+        Assert.assertEquals(HttpServletResponse.SC_CONFLICT, client.getStatusCode());
+        Assert.assertFalse(plantedJsp.exists());
+
+        sendRequest(client, createRequest("GET", "/planted.jsp", null, null));
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
+    }
+
+
+    private void createFile(File file) throws IOException {
+        try (FileWriter fw = new FileWriter(file)) {
+            fw.write(CONTENT);
+        }
+    }
+
+
+    private String basicAuthorization(String user, String password) {
+        String credentials = Base64.getEncoder()
+                .encodeToString((user + ":" + password).getBytes(StandardCharsets.ISO_8859_1));
+        return "Authorization: Basic " + credentials;
+    }
+
+
+    private String createRequest(String method, String path, String authorization, String body) {
+        StringBuilder request = new StringBuilder();
+        request.append(method);
+        request.append(' ');
+        request.append(path);
+        request.append(" HTTP/1.1");
+        request.append(CRLF);
+        request.append("Host: localhost:");
+        request.append(getPort());
+        request.append(CRLF);
+        if (authorization != null) {
+            request.append(authorization);
+            request.append(CRLF);
+        }
+        if (body != null) {
+            request.append("Content-Length: ");
+            request.append(body.length());
+            request.append(CRLF);
+        }
+        request.append("Connection: Close");
+        request.append(CRLF);
+        request.append(CRLF);
+        if (body != null) {
+            request.append(body);
+        }
+        return request.toString();
+    }
+
+
+    private void sendRequest(Client client, String request) throws IOException, InterruptedException {
+        client.resetResponse();
+        client.setRequest(new String[] { request });
+        client.connect();
+        client.processRequest(true);
     }
 
 
