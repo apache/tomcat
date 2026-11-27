@@ -441,6 +441,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Document the ordering requirements for the
+        <strong>SemaphoreValve</strong> and the <strong>PersistentValve</strong>
+        when used with the <strong>RewriteValve</strong>. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Tribes">
     <changelog>
       <docs>
