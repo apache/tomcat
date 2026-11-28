@@ -779,10 +779,12 @@
     <include name="org/apache/tomcat/util/modeler/**" />
     <include name="org/apache/tomcat/util/net/**" />
     <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+    <exclude name="org/apache/coyote/http11/filters/brotli/**"/>
   </patternset>
 
   <patternset id="files.tomcat-coyote-ffm">
     <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
+    <include name="org/apache/coyote/http11/filters/brotli/**"/>
     <include name="org/apache/tomcat/util/openssl/**"/>
   </patternset>
 
@@ -1057,6 +1059,7 @@
       <classpath refid="compile.classpath" />
       <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
       <exclude name="org/apache/tomcat/util/openssl/**"/>
+      <exclude name="org/apache/coyote/http11/filters/brotli/**"/>
     </javac>
     <!-- Compile internal server components that use FFM -->
     <javac srcdir="java" destdir="${tomcat.classes}"
@@ -1072,6 +1075,7 @@
       <classpath refid="compile.classpath" />
       <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
       <include name="org/apache/tomcat/util/openssl/**"/>
+      <include name="org/apache/coyote/http11/filters/brotli/**"/>
     </javac>
     <!-- Copy static resource files -->
     <copy todir="${tomcat.classes}" encoding="UTF-8">
@@ -1956,6 +1960,7 @@
       <!-- Exclude FFM tests as they are compiled below -->
       <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
       <exclude name="org/apache/tomcat/util/openssl/**"/>
+      <exclude name="org/apache/coyote/http11/filters/brotli/**"/>
     </javac>
     <!-- Compile tests that use FFM -->
     <javac srcdir="test" destdir="${test.classes}"
@@ -1971,6 +1976,7 @@
       <classpath refid="tomcat.test.classpath" />
       <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
       <include name="org/apache/tomcat/util/openssl/**"/>
+      <include name="org/apache/coyote/http11/filters/brotli/**"/>
     </javac>
     <copy todir="${test.classes}">
       <fileset dir="test">
@@ -2318,6 +2324,7 @@
               <!-- Exclude FFM tests unless FFM has been compiled -->
               <exclude name="org/apache/tomcat/util/net/openssl/panama/**" unless="has-ffm"/>
               <exclude name="org/apache/tomcat/util/openssl/**" unless="has-ffm"/>
+              <exclude name="org/apache/coyote/http11/filters/brotli/**" unless="has-ffm"/>
             </fileset>
           </batchtest>
         </junit>
@@ -2639,6 +2646,7 @@
         <exclude name="org/apache/tomcat/util/json/**"/>
         <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
         <exclude name="org/apache/tomcat/util/openssl/**"/>
+        <exclude name="org/apache/coyote/http11/filters/brotli/**"/>
       </packageset>
       <!--jdbc-pool src files for javadoc-->
       <packageset dir="${tomcat.dist}/src/modules/jdbc-pool/src/main/java"/>

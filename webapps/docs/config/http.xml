@@ -470,6 +470,35 @@
       If you specify a type explicitly, the default is over-ridden.</p>
     </attribute>
 
+    <attribute name="compressionBrotliQuality" required="false">
+      <p>Enables compression with Brotli, as an alternative to gzip, when
+      <code>compression</code> is enabled. The value is the quality used by the
+      encoder, from <code>0</code> (fastest) to <code>11</code> (smallest
+      output). Qualities above <code>5</code> use a lot of CPU and are not
+      suitable for responses that are generated for each request. The default
+      value is <code>-1</code>, which disables Brotli so that only gzip is
+      used.</p>
+      <p>Brotli is used for a response if the client accepts it and it is
+      preferred to gzip, taking the <code>q</code> values of the
+      <code>Accept-Encoding</code> request header field into account. If they
+      are the same, Brotli is used if the client has listed it. Otherwise the
+      response is compressed with gzip, or is not compressed, exactly as it is
+      without Brotli. The same connector attributes apply to both encodings and
+      they are used for HTTP/1.1 and for HTTP/2.</p>
+      <p>Tomcat does not include a Brotli encoder. This feature uses the
+      Brotli library, <code>libbrotlienc</code>, of the operating system. It
+      requires the optional FFM support (<code>tomcat-coyote-ffm.jar</code>) and
+      a JRE that supports it, as for the OpenSSL support of the FFM API. If the
+      library cannot be used, a warning is logged and gzip is used. The memory
+      used by the encoder is not part of the Java heap. A response that is being
+      compressed uses between about 0.5 and 2 MiB, depending on the quality, and
+      the memory is released when the response is complete. The total is
+      bounded by the number of responses that are being compressed at the same
+      time, which should be taken into account when choosing the quality.</p>
+      <p>As with gzip, compressing a response that contains both a secret and
+      content that is controlled by an attacker can leak the secret.</p>
+    </attribute>
+
     <attribute name="compression" required="false">
       <p>The <strong>Connector</strong> may use HTTP/1.1 GZIP compression in
       an attempt to save server bandwidth. The acceptable values for the

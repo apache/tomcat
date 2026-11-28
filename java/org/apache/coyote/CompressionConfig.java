@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import org.apache.coyote.http11.filters.BrotliEncoder;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -57,6 +58,10 @@ public class CompressionConfig {
             "text/javascript,application/javascript,application/json,application/xml";
     private String[] compressibleMimeTypes = null;
     private int compressionMinSize = 2048;
+    private int compressionBrotliQuality = -1;
+
+    // The position of the note of the response that holds the Brotli quality that was chosen for it
+    private static final int NOTE_BROTLI_QUALITY = 9;
     private Set<String> noCompressionEncodings =
             new HashSet<>(Arrays.asList("br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd"));
 
@@ -258,6 +263,72 @@ public class CompressionConfig {
 
 
     /**
+     * Returns the quality used for Brotli compression.
+     *
+     * @return the quality from 0 (fastest) to 11 (smallest) or -1 if Brotli is not used
+     */
+    public int getCompressionBrotliQuality() {
+        return compressionBrotliQuality;
+    }
+
+
+    /**
+     * Sets the quality used for Brotli compression. Brotli is only used if it is enabled with a quality of 0 or more,
+     * the client accepts it and the Brotli library is available. Otherwise gzip is used.
+     *
+     * @param compressionBrotliQuality the quality from 0 (fastest) to 11 (smallest) or -1 to disable Brotli
+     *
+     * @throws IllegalArgumentException if the quality is not between -1 and 11
+     */
+    public void setCompressionBrotliQuality(int compressionBrotliQuality) {
+        if (compressionBrotliQuality < -1 || compressionBrotliQuality > 11) {
+            throw new IllegalArgumentException(sm.getString("compressionConfig.invalidBrotliQuality",
+                    Integer.valueOf(compressionBrotliQuality)));
+        }
+        if (compressionBrotliQuality >= 0 && !BrotliEncoder.isAvailable()) {
+            log.warn(sm.getString("compressionConfig.brotliUnavailable"));
+        }
+        this.compressionBrotliQuality = compressionBrotliQuality;
+    }
+
+
+    /**
+     * Returns the Brotli quality that was chosen for a response, for which {@link #useCompression(Request, Response)}
+     * returned {@code true}. The quality is read from the configuration once, when Brotli is chosen, so it is that
+     * which was used to choose Brotli even if the configuration has been changed since.
+     *
+     * @param response The response that is being compressed
+     *
+     * @return the quality from 0 (fastest) to 11 (smallest) or -1 if the response is not compressed with Brotli
+     */
+    public static int getBrotliQuality(Response response) {
+        if (isBrotli(response) && response.getNote(NOTE_BROTLI_QUALITY) instanceof Integer quality) {
+            return quality.intValue();
+        }
+        return -1;
+    }
+
+
+    /**
+     * Determines if the compression selected for a response, for which {@link #useCompression(Request, Response)}
+     * returned {@code true}, is Brotli rather than gzip.
+     *
+     * @param response The response that is being compressed
+     *
+     * @return {@code true} if the response is compressed with Brotli
+     */
+    public static boolean isBrotli(Response response) {
+        Enumeration<String> contentEncodings = response.getMimeHeaders().values("Content-Encoding");
+        while (contentEncodings.hasMoreElements()) {
+            if ("br".equalsIgnoreCase(contentEncodings.nextElement().trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Determines if compression should be enabled for the given response and if it is, sets any necessary headers to
      * mark it as such.
      *
@@ -274,6 +345,8 @@ public class CompressionConfig {
 
         boolean useTransferEncoding = false;
         boolean useContentEncoding = true;
+        boolean useBrotli = false;
+        int brotliQuality = -1;
 
         MimeHeaders responseHeaders = response.getMimeHeaders();
 
@@ -357,9 +430,21 @@ public class CompressionConfig {
             ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
 
             /*
-             * Check if user-agent supports gzip encoding. Only interested in whether gzip encoding is supported. Other
-             * encodings can be ignored.
+             * Check which of the encodings supported by this server, gzip and, if enabled, Brotli, the user-agent
+             * supports. Other encodings can be ignored.
              */
+            // The configuration can be changed at any time so it is read once. The quality that is used is the one that
+            // was used to decide to use Brotli.
+            brotliQuality = compressionBrotliQuality;
+            boolean brotliEnabled = brotliQuality >= 0 && BrotliEncoder.isAvailable();
+            // The weight of an encoding that has not been listed is the weight of the wildcard, if there is one
+            double gzipWeight = 0;
+            double brotliWeight = 0;
+            double wildcardWeight = 0;
+            boolean gzipListed = false;
+            boolean brotliListed = false;
+            boolean gzipExcluded = false;
+            boolean brotliExcluded = false;
             headerValues = request.getMimeHeaders().values("accept-encoding");
             while (headerValues.hasMoreElements()) {
                 List<AcceptEncoding> acceptEncodings;
@@ -371,15 +456,41 @@ public class CompressionConfig {
                 }
 
                 for (AcceptEncoding acceptEncoding : acceptEncodings) {
-                    if (("gzip".equalsIgnoreCase(acceptEncoding.getEncoding()) ||
-                            "*".equals(acceptEncoding.getEncoding())) && acceptEncoding.getQuality() > 0) {
-                        foundGzip = true;
-                    }
-                    if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding()) && acceptEncoding.getQuality() == 0) {
+                    String encoding = acceptEncoding.getEncoding();
+                    double quality = acceptEncoding.getQuality();
+                    if ("gzip".equalsIgnoreCase(encoding)) {
+                        gzipListed = true;
+                        gzipWeight = Math.max(gzipWeight, quality);
                         // gzip is explicitly disabled
-                        return false;
+                        gzipExcluded |= quality == 0;
+                    } else if (brotliEnabled && "br".equalsIgnoreCase(encoding)) {
+                        brotliListed = true;
+                        brotliWeight = Math.max(brotliWeight, quality);
+                        brotliExcluded |= quality == 0;
+                    } else if ("*".equals(encoding)) {
+                        wildcardWeight = Math.max(wildcardWeight, quality);
                     }
                 }
+            }
+
+            if (gzipExcluded) {
+                gzipWeight = 0;
+            } else if (!gzipListed) {
+                gzipWeight = wildcardWeight;
+            }
+            if (brotliExcluded) {
+                brotliWeight = 0;
+            } else if (!brotliListed) {
+                brotliWeight = wildcardWeight;
+            }
+
+            foundGzip = gzipWeight > 0;
+            // Brotli is only used if it is the encoding that is preferred by the user-agent. If the weights are the
+            // same, it is used if the user-agent has asked for it, as it is expected to produce the smaller response.
+            useBrotli = brotliEnabled && brotliWeight > 0 &&
+                    (brotliWeight > gzipWeight || brotliWeight == gzipWeight && brotliListed);
+            if (useBrotli) {
+                foundGzip = true;
             }
         }
 
@@ -411,7 +522,10 @@ public class CompressionConfig {
             responseHeaders.addValue("Transfer-Encoding").setString("gzip");
         } else {
             // Configure the content encoding for compressed content
-            responseHeaders.addValue("Content-Encoding").setString("gzip");
+            responseHeaders.addValue("Content-Encoding").setString(useBrotli ? "br" : "gzip");
+            if (useBrotli) {
+                response.setNote(NOTE_BROTLI_QUALITY, Integer.valueOf(brotliQuality));
+            }
         }
 
         return true;
