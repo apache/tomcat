@@ -215,6 +215,17 @@
            set to larger than the typical access log message size.</p>
       </attribute>
 
+      <attribute name="minRequestDuration" required="false">
+        <p>The minimum time, in milliseconds, that a request must take to be
+        logged. Requests that take less time are not logged, which allows a
+        second valve to be used to log only the slow requests. The time is
+        measured as for the <code>%D</code> and <code>%T</code> pattern codes
+        and includes the time taken by asynchronous processing. A request that
+        takes exactly this time is logged. This is applied in addition to
+        <code>conditionIf</code> and <code>conditionUnless</code>. The default
+        value is <code>0</code>, which logs every request.</p>
+      </attribute>
+
       <attribute name="pattern" required="false">
         <p>A formatting layout identifying the various information fields
         from the request and response to be logged, or the word
