@@ -103,7 +103,15 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
                 Assert.assertFalse(tc3.rlHeader[24].contains("r=0"));
                 Assert.assertTrue(tc3.rlHeader[allowedRequests].contains("r=0"));
             }
-        } else {
+        }
+        // Retry-After is only sent with the rejected responses, and only when the headers are exposed
+        int maxRetryAfter = exactRateLimiter.getDuration();
+        TestRateLimitFilter.assertRetryAfter(false, tc3.retryAfterHeader[24], maxRetryAfter);
+        TestRateLimitFilter.assertRetryAfter(exposeHeaders && enforce, tc3.retryAfterHeader[allowedRequests],
+                maxRetryAfter);
+        TestRateLimitFilter.assertRetryAfter(exposeHeaders && enforce, tc4.retryAfterHeader[allowedRequests],
+                maxRetryAfter);
+        if (!exposeHeaders) {
             Assert.assertTrue(tc3.rlpHeader[24] == null);
             Assert.assertTrue(tc3.rlHeader[24] == null);
             Assert.assertTrue(tc3.rlpHeader[allowedRequests] == null);

@@ -32,6 +32,7 @@ public abstract class TesterRateLimitClientBase extends Thread {
     int[] results;
     volatile String[] rlpHeader;
     volatile String[] rlHeader;
+    volatile String[] retryAfterHeader;
 
     TesterRateLimitClientBase(RateLimitFilter filter, FilterChain filterChain, String ip, int requests) {
         this.filter = filter;
@@ -41,6 +42,7 @@ public abstract class TesterRateLimitClientBase extends Thread {
         this.results = new int[requests];
         this.rlpHeader = new String[requests];
         this.rlHeader = new String[requests];
+        this.retryAfterHeader = new String[requests];
         super.setDaemon(true);
         super.start();
     }
@@ -58,6 +60,7 @@ public abstract class TesterRateLimitClientBase extends Thread {
                 results[i] = response.getStatus();
                 rlpHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT_POLICY);
                 rlHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT);
+                retryAfterHeader[i] = response.getHeader("Retry-After");
                 //System.out.printf("%s %s: %s %d, Policy:%s, Current:%s\n", ip, Instant.now(),
                 //        Integer.valueOf(i + 1), Integer.valueOf(response.getStatus()), rlpHeader[i], rlHeader[i]);
 

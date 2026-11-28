@@ -220,6 +220,12 @@
         been removed so classes that implement the <code>Context</code>
         interface must implement this method. (markt)
       </fix>
+      <add>
+        When <code>exposeHeaders</code> is enabled, send a
+        <code>Retry-After</code> header with the <code>429</code> responses
+        that the <strong>Rate Limit Filter</strong> sends when it enforces the
+        limit. (abernal)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Accept one or more space characters between the authentication scheme
