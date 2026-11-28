@@ -43,6 +43,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.parser.Authorization;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.util.security.ConstantTime;
 
@@ -433,14 +434,14 @@ public class DigestAuthenticator extends AuthenticatorBase {
     protected void setAuthenticateHeader(HttpServletRequest request, HttpServletResponse response, String nonce,
             boolean isNonceStale) {
 
-        String realmName = getRealmName(context);
+        String realmName = HttpParser.quote(getRealmName(context));
 
         boolean first = true;
         for (AuthDigest algorithm : algorithms) {
             StringBuilder authenticateHeader = new StringBuilder(200);
-            authenticateHeader.append("Digest realm=\"");
+            authenticateHeader.append("Digest realm=");
             authenticateHeader.append(realmName);
-            authenticateHeader.append("\", qop=\"");
+            authenticateHeader.append(", qop=\"");
             authenticateHeader.append(QOP);
             authenticateHeader.append("\", nonce=\"");
             authenticateHeader.append(nonce);

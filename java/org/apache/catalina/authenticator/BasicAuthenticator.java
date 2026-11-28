@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.parser.HttpParser;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 7617: "The
@@ -113,9 +114,8 @@ public class BasicAuthenticator extends AuthenticatorBase {
 
         // the request could not be authenticated, so reissue the challenge
         StringBuilder value = new StringBuilder(16);
-        value.append("Basic realm=\"");
-        value.append(getRealmName(context));
-        value.append('\"');
+        value.append("Basic realm=");
+        value.append(HttpParser.quote(getRealmName(context)));
         if (charsetString != null && !charsetString.isEmpty()) {
             value.append(", charset=");
             value.append(charsetString);
