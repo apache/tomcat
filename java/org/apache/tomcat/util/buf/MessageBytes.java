@@ -25,6 +25,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 /**
@@ -308,8 +309,19 @@ public final class MessageBytes implements Cloneable, Serializable {
             return;
         }
 
+        Charset charset = getCharset();
+        if (charset == StandardCharsets.UTF_8) {
+            // ASCII is encoded as is, so skip the encoder
+            byte[] ascii = type == T_CHARS ? toAscii(charC.getChars(), charC.getStart(), charC.getLength()) :
+                    toAscii(strValue);
+            if (ascii != null) {
+                byteC.setBytes(ascii, 0, ascii.length);
+                return;
+            }
+        }
+
         ByteBuffer bb;
-        CharsetEncoder encoder = getCharset().newEncoder();
+        CharsetEncoder encoder = charset.newEncoder();
         encoder.onMalformedInput(CodingErrorAction.REPORT);
         encoder.onUnmappableCharacter(CodingErrorAction.REPORT);
 
@@ -329,6 +341,35 @@ public final class MessageBytes implements Cloneable, Serializable {
         }
 
         byteC.setBytes(bb.array(), bb.arrayOffset(), bb.limit());
+    }
+
+
+    private static byte[] toAscii(String s) {
+        int len = s.length();
+        for (int i = 0; i < len; i++) {
+            if (s.charAt(i) > 0x7F) {
+                return null;
+            }
+        }
+        byte[] result = new byte[len];
+        for (int i = 0; i < len; i++) {
+            result[i] = (byte) s.charAt(i);
+        }
+        return result;
+    }
+
+
+    private static byte[] toAscii(char[] chars, int off, int len) {
+        for (int i = 0; i < len; i++) {
+            if (chars[off + i] > 0x7F) {
+                return null;
+            }
+        }
+        byte[] result = new byte[len];
+        for (int i = 0; i < len; i++) {
+            result[i] = (byte) chars[off + i];
+        }
+        return result;
     }
 
 
