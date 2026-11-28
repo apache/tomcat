@@ -257,9 +257,13 @@ public class HttpHeaderParser {
                 } else {
                     // Replace the line folding with a single space as required
                     // by RFC 9112 section 5.2. Any further whitespace at the
-                    // start of the continuation line is skipped below.
-                    source.getHeaderByteBuffer().put(headerData.realPos, SP);
-                    headerData.realPos++;
+                    // start of the continuation line is skipped below. A fold
+                    // before the value is leading whitespace, which is not part
+                    // of the field value (RFC 9110 section 5.5).
+                    if (headerData.realPos > headerData.start) {
+                        source.getHeaderByteBuffer().put(headerData.realPos, SP);
+                        headerData.realPos++;
+                    }
                     headerParsePos = HeaderParsePosition.HEADER_VALUE_START;
                 }
             }
