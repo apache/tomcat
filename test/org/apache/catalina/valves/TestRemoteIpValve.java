@@ -1304,6 +1304,36 @@ public class TestRemoteIpValve {
         Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
     }
 
+    /*
+     * Entries in the header that are not IP addresses must not be resolved. localhost would resolve to an address in
+     * the internal proxies and be skipped as an internal proxy if it was.
+     */
+    @Test
+    public void testInvokeNameInTheChainIsNotResolvedCidr() throws Exception {
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setInternalProxies("127.0.0.0/8,::1,192.168.0.0/16");
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProxiesHeader("x-forwarded-by");
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest(new org.apache.coyote.Request());
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+        request.getCoyoteRequest().getMimeHeaders().addValue("x-forwarded-for")
+                .setString("140.211.11.130, unknown, localhost, 192.168.0.5");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        Assert.assertEquals("remoteAddr", "localhost", remoteAddrAndHostTrackerValve.getRemoteAddr());
+        Assert.assertEquals("x-forwarded-for", "140.211.11.130,unknown",
+                remoteAddrAndHostTrackerValve.getForwardedFor());
+        Assert.assertNull("x-forwarded-by", remoteAddrAndHostTrackerValve.getForwardedBy());
+    }
+
     @Test
     public void testInternalProxiesCidr() throws Exception {
         RemoteIpValve remoteIpValve = new RemoteIpValve();
