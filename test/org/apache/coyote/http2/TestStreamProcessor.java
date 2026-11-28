@@ -593,6 +593,64 @@ public class TestStreamProcessor extends Http2TestBase {
     }
 
 
+    /*
+     * RFC 9113, section 5.1: no frames other than PRIORITY may be sent on a closed stream. The stream is reset because
+     * the request body is longer than its content-length. When the application then tries to write the response to the
+     * reset stream a second RST_STREAM must not be sent.
+     */
+    @Test
+    public void testSingleResetForAppWriteAfterReset() throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // Map the servlet to /simple so we can re-use the HTTP/2 handling logic from the super class.
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        WriteAfterReset servlet = new WriteAfterReset();
+        Tomcat.addServlet(ctxt, "writeAfterReset", servlet);
+        ctxt.addServletMapping("/writeAfterReset", "writeAfterReset");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] headersFrameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        byte[] dataFrameHeader = new byte[9];
+        // More data than the content-length header field states
+        ByteBuffer dataPayload = ByteBuffer.allocate(5);
+        buildPostRequest(headersFrameHeader, headersPayload, false, null, 3, "/writeAfterReset", dataFrameHeader,
+                dataPayload, null, false, 3);
+        writeFrame(headersFrameHeader, headersPayload);
+        // Wait until the application is running so it will write after the stream has been reset
+        Assert.assertTrue(servlet.awaitStarted());
+        writeFrame(dataFrameHeader, dataPayload);
+
+        while (!output.getTrace().contains("3-RST-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]")) {
+            parser.readFrame();
+        }
+        output.clearTrace();
+
+        // Let the application write to the reset stream and wait for it to finish
+        servlet.release();
+        Assert.assertTrue(servlet.awaitFinished());
+        // The reset (if any) is sent as soon as the application returns control to Tomcat
+        Thread.sleep(500);
+
+        sendPing(0, false, new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 });
+        while (!output.getTrace().contains("0-Ping-Ack-[1,2,3,4,5,6,7,8]")) {
+            parser.readFrame();
+        }
+
+        Assert.assertFalse(output.getTrace(), output.getTrace().contains("3-RST-"));
+    }
+
+
     @Test
     public void testEarlyHints() throws Exception {
         enableHttp2();
@@ -964,6 +1022,42 @@ public class TestStreamProcessor extends Http2TestBase {
                     throw new IOException(e);
                 }
                 count++;
+            }
+        }
+    }
+
+    private static final class WriteAfterReset extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final transient CountDownLatch started = new CountDownLatch(1);
+        private final transient CountDownLatch release = new CountDownLatch(1);
+        private final transient CountDownLatch finished = new CountDownLatch(1);
+
+        boolean awaitStarted() throws InterruptedException {
+            return started.await(10, TimeUnit.SECONDS);
+        }
+
+        void release() {
+            release.countDown();
+        }
+
+        boolean awaitFinished() throws InterruptedException {
+            return finished.await(10, TimeUnit.SECONDS);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            started.countDown();
+            try {
+                release.await(10, TimeUnit.SECONDS);
+                response.setContentType("text/plain");
+                response.getOutputStream().write("response".getBytes(StandardCharsets.ISO_8859_1));
+                response.flushBuffer();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                finished.countDown();
             }
         }
     }
