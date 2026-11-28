@@ -757,6 +757,24 @@
       present in the value will be ignored.</p>
     </attribute>
 
+    <attribute name="responseBufferSize" required="false">
+      <p>The size, in bytes, of the buffer that holds the response content
+      before the response is committed. If the whole response fits in the
+      buffer, is not flushed and no <code>Content-Length</code> header has been
+      set, Tomcat sets the <code>Content-Length</code> header. Otherwise the
+      response is committed when the buffer is full, and for HTTP/1.1 it is
+      sent using chunked encoding unless the servlet has set the
+      <code>Content-Length</code> header. HTTP/2 does not use chunked encoding.
+      A smaller buffer commits the response earlier, after which the status and
+      the headers can no longer be changed. A servlet may request a larger
+      buffer for a single response with
+      <code>ServletResponse.setBufferSize()</code>. The buffer is allocated for
+      every response so a large value increases the memory used by each
+      concurrent request. The value must be at least <code>1024</code>. It
+      applies to HTTP/1.1 and to HTTP/2. If not specified, the default value of
+      <code>8192</code> will be used.</p>
+    </attribute>
+
     <attribute name="restrictedUserAgents" required="false">
       <p>The value is a regular expression (using <code>java.util.regex</code>)
       matching the entire <code>user-agent</code> header of HTTP clients for
