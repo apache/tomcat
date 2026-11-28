@@ -104,15 +104,15 @@ class Http2AsyncParser extends Http2Parser {
 
         @Override
         public void completed(Long result, Void attachment) {
-            if (streamException || error == null) {
+            /*
+             * A frame that is not a SETTINGS frame, which is the only frame type that is expected, is reported as a
+             * stream error. The connection preface is invalid, which is a connection error, so don't process it.
+             */
+            if (error == null) {
                 ByteBuffer payload = buffers[2];
                 payload.flip();
                 try {
-                    if (streamException) {
-                        swallowPayload(streamId, frameTypeId, payloadSize, false, payload);
-                    } else {
-                        readSettingsFrame(flags, payloadSize, payload);
-                    }
+                    readSettingsFrame(flags, payloadSize, payload);
                 } catch (RuntimeException | IOException | Http2Exception e) {
                     error = e;
                 }
