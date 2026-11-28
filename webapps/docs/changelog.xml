@@ -228,6 +228,10 @@
         one space was required. Pull request <pr>1148</pr> provided by Arturo
         Bernal. (markt)
       </fix>
+      <update>
+        Increase the default value of the <code>maxLocaleCount</code> attribute
+        of the <code>Connector</code> from 10 to 20.
+      </update>
       <fix>
         Stricter parsing of the digest authentication header. Pull request
         <pr>1109</pr> provided by Arturo Bernal. (markt)
