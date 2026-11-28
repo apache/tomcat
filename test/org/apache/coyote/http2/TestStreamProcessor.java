@@ -90,6 +90,59 @@ public class TestStreamProcessor extends Http2TestBase {
     }
 
 
+    /*
+     * RFC 9113, section 8.1.1 states that a response is malformed if the value of the content-length header field is
+     * not the sum of the DATA frame payloads. Ending the stream normally would present a truncated response as a
+     * complete one so the stream is reset.
+     */
+    @Test
+    public void testResponseShorterThanContentLength() throws Exception {
+        doTestResponseShorterThanContentLength(false);
+    }
+
+
+    @Test
+    public void testResponseShorterThanContentLengthFlushed() throws Exception {
+        doTestResponseShorterThanContentLength(true);
+    }
+
+
+    private void doTestResponseShorterThanContentLength(boolean flush) throws Exception {
+        enableHttp2();
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // Map the servlet to /simple so we can re-use the HTTP/2 handling logic from the super class.
+        Context ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
+        ctxt.addServletMapping("/simple", "simple");
+        Tomcat.addServlet(ctxt, "short", new ShortContent(flush));
+        ctxt.addServletMapping("/short", "short");
+
+        tomcat.start();
+
+        openClientConnection();
+        doHttpUpgrade();
+        sendClientPreface();
+        validateHttp2InitialResponse();
+
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+        buildGetRequest(frameHeader, headersPayload, null, 3, "/short");
+        writeFrame(frameHeader, headersPayload);
+
+        parser.readFrame();
+        while (!output.getTrace().contains("3-RST")) {
+            parser.readFrame();
+        }
+
+        String trace = output.getTrace();
+        Assert.assertTrue(trace, trace.contains("3-Header-[content-length]-[10]"));
+        Assert.assertTrue(trace, trace.contains("3-RST-[" + Http2Error.PROTOCOL_ERROR.getCode() + "]"));
+        Assert.assertFalse(trace, trace.contains("3-EndOfStream"));
+    }
+
+
     @Test
     public void testAsyncDispatch() throws Exception {
         enableHttp2();
@@ -964,6 +1017,28 @@ public class TestStreamProcessor extends Http2TestBase {
                     throw new IOException(e);
                 }
                 count++;
+            }
+        }
+    }
+
+    private static final class ShortContent extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private final boolean flush;
+
+        ShortContent(boolean flush) {
+            this.flush = flush;
+        }
+
+        @Override
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+            response.setContentType("text/plain");
+            response.setContentLength(10);
+            // Less than the content length
+            response.getOutputStream().write("01234".getBytes(StandardCharsets.ISO_8859_1));
+            if (flush) {
+                response.flushBuffer();
             }
         }
     }
