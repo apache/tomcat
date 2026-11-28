@@ -2106,6 +2106,85 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
     }
 
+    @Test
+    public void testMoveCollectionDepthZero() throws Exception {
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-move-depth");
+        File sub = new File(tempWebapp, "src/sub");
+        Assert.assertTrue(sub.mkdirs());
+        writeFile(new File(tempWebapp, "src/a.txt"));
+        writeFile(new File(sub, "b.txt"));
+
+        Client client = startWritableWebdav(tempWebapp);
+
+        // RFC 4918 9.9.2: Depth: 0 is not valid for MOVE on a collection
+        // @formatter:off
+        client.setRequest(new String[] {
+                "MOVE /src HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Depth: 0" + CRLF +
+                    "Destination: /dst" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, client.getStatusCode());
+        Assert.assertTrue(new File(tempWebapp, "src/a.txt").isFile());
+        Assert.assertTrue(new File(sub, "b.txt").isFile());
+        Assert.assertFalse(new File(tempWebapp, "dst").exists());
+    }
+
+
+    @Test
+    public void testCopyInvalidDepthKeepsDestination() throws Exception {
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-copy-depth");
+        Assert.assertTrue(tempWebapp.mkdirs());
+        writeFile(new File(tempWebapp, "file1.txt"));
+        File destination = new File(tempWebapp, "file2.txt");
+        writeFile(destination);
+
+        Client client = startWritableWebdav(tempWebapp);
+
+        // @formatter:off
+        client.setRequest(new String[] {
+                "COPY /file1.txt HTTP/1.1" + CRLF +
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Depth: 1" + CRLF +
+                    "Overwrite: T" + CRLF +
+                    "Destination: /file2.txt" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
+                });
+        // @formatter:on
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, client.getStatusCode());
+        Assert.assertTrue(destination.isFile());
+    }
+
+
+    private Client startWritableWebdav(File docBase) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context ctxt = tomcat.addContext("", docBase.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("readonly", "false");
+        ctxt.addServletMapping("/*", "webdav");
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+        return client;
+    }
+
+
+    private static void writeFile(File file) throws IOException {
+        try (FileWriter fw = new FileWriter(file)) {
+            fw.write(CONTENT);
+        }
+    }
+
+
     private void validateXml(String xmlContent) throws Exception {
         SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(xmlContent)));
     }
