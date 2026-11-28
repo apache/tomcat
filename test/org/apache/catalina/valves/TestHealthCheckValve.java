@@ -113,4 +113,49 @@ public class TestHealthCheckValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testGetSetProperties() {
+        HealthCheckValve valve = new HealthCheckValve();
+
+        // Default path
+        Assert.assertEquals("/health", valve.getPath());
+
+        valve.setPath("/ready");
+        Assert.assertEquals("/ready", valve.getPath());
+
+        // Default checkContainersAvailable
+        Assert.assertTrue(valve.getCheckContainersAvailable());
+
+        valve.setCheckContainersAvailable(false);
+        Assert.assertFalse(valve.getCheckContainersAvailable());
+
+        valve.setCheckContainersAvailable(true);
+        Assert.assertTrue(valve.getCheckContainersAvailable());
+    }
+
+
+    @Test
+    public void testCustomPath() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = getProgrammaticRootContext();
+
+        HealthCheckValve healthCheckValve = new HealthCheckValve();
+        healthCheckValve.setPath("/ready");
+        ctx.getParent().getPipeline().addValve(healthCheckValve);
+
+        tomcat.start();
+
+        ByteChunk result = new ByteChunk();
+
+        // Default /health should NOT match
+        int rc = getUrl("http://localhost:" + getPort() + "/health", result, null);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+
+        result.recycle();
+
+        // Custom /ready should match
+        rc = getUrl("http://localhost:" + getPort() + "/ready", result, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertTrue(result.toString().contains("UP"));
+    }
 }
