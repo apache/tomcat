@@ -2380,4 +2380,62 @@ public class TestHttp11Processor extends TomcatBaseTest {
         protocol.setAltService(null);
         Assert.assertNull(protocol.getAltService());
     }
+
+
+    /*
+     * RFC 9110, section 5.1 requires a field name to be a token. Header fields with any other name are not sent.
+     */
+    @Test
+    public void testResponseHeaderNameNotToken() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "InvalidHeaderNameServlet", new InvalidHeaderNameServlet());
+        ctx.addServletMapping("/*", "InvalidHeaderNameServlet");
+
+        tomcat.start();
+
+        // @formatter:off
+        String request =
+                "GET /anything HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                "Connection: close" + CRLF +
+                CRLF;
+        // @formatter:on
+
+        Client client = new Client(tomcat.getConnector().getLocalPort());
+        client.setRequest(new String[] { request });
+
+        client.connect();
+        client.processRequest();
+
+        Assert.assertTrue(client.isResponse200());
+        List<String> headers = client.getResponseHeaders();
+        Assert.assertTrue(headers.toString(), headers.contains("X-Valid: v"));
+        for (String header : headers) {
+            for (String name : InvalidHeaderNameServlet.INVALID_NAMES) {
+                Assert.assertFalse(header, header.startsWith(name));
+            }
+        }
+    }
+
+
+    private static final class InvalidHeaderNameServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private static final String[] INVALID_NAMES = { "bad name", "X(Y)", "X:Y", "Xé" };
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            for (String name : INVALID_NAMES) {
+                resp.setHeader(name, "v");
+            }
+            resp.setHeader("X-Valid", "v");
+            resp.setContentType("text/plain");
+            resp.getWriter().print("test - data");
+        }
+    }
 }
