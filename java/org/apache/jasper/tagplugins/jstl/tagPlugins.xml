@@ -60,4 +60,8 @@
     <tag-class>org.apache.taglibs.standard.tag.rt.core.ImportTag</tag-class>
     <plugin-class>org.apache.jasper.tagplugins.jstl.core.Import</plugin-class>
   </tag-plugin>
+  <tag-plugin>
+    <tag-class>org.apache.taglibs.standard.tag.rt.core.ParamTag</tag-class>
+    <plugin-class>org.apache.jasper.tagplugins.jstl.core.Param</plugin-class>
+  </tag-plugin>
 </tag-plugins>
