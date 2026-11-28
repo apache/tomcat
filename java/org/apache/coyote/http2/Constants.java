@@ -16,6 +16,8 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.Set;
+
 /**
  * HTTP/2 protocol constants.
  */
@@ -60,6 +62,13 @@ public class Constants {
      * Default maximum trailer size.
      */
     static final int DEFAULT_MAX_TRAILER_SIZE = 8 * 1024;
+
+    // Header fields
+    /**
+     * Connection-specific header fields. RFC 9113, section 8.2.2 forbids them in HTTP/2 messages.
+     */
+    static final Set<String> CONNECTION_SPECIFIC_HEADERS =
+            Set.of("connection", "proxy-connection", "keep-alive", "transfer-encoding", "upgrade");
 
     /**
      * Private constructor to prevent instantiation.
